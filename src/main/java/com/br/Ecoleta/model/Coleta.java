@@ -1,6 +1,6 @@
-package com.br.Ecoleta.model;
+package com.br.ecoleta.model;
 
-import com.br.Ecoleta.util.ColetaStatus;
+import com.br.ecoleta.util.ColetaStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;

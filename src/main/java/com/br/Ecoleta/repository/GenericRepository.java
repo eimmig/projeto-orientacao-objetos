@@ -1,4 +1,4 @@
-package com.br.Ecoleta.repository;
+package com.br.ecoleta.repository;
 
 import java.util.List;
 import java.util.Optional;

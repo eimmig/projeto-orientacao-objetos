@@ -1,7 +1,7 @@
-package com.br.Ecoleta.view;
+package com.br.ecoleta.view;
 
-import com.br.Ecoleta.controller.ClienteController;
-import com.br.Ecoleta.model.Cliente;
+import com.br.ecoleta.controller.ClienteController;
+import com.br.ecoleta.model.Cliente;
 import java.util.Optional;
 import java.util.Scanner;
 

@@ -1,7 +1,7 @@
-package com.br.Ecoleta.service;
+package com.br.ecoleta.service;
 
-import com.br.Ecoleta.model.Cliente;
-import com.br.Ecoleta.repository.ClienteRepository;
+import com.br.ecoleta.model.Cliente;
+import com.br.ecoleta.repository.ClienteRepository;
 
 public class ClienteService extends GenericService<Cliente, Long> {
 

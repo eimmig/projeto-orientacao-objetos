@@ -1,4 +1,4 @@
-package com.br.Ecoleta.model;
+package com.br.ecoleta.model;
 
 import jakarta.persistence.*;
 import java.util.HashSet;

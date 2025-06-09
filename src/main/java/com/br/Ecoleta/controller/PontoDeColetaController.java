@@ -1,7 +1,7 @@
-package com.br.Ecoleta.controller;
+package com.br.ecoleta.controller;
 
-import com.br.Ecoleta.model.PontoDeColeta;
-import com.br.Ecoleta.service.PontoDeColetaService;
+import com.br.ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.service.PontoDeColetaService;
 
 public class PontoDeColetaController extends GenericController<PontoDeColeta, Long> {
 

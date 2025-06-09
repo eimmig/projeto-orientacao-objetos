@@ -1,4 +1,4 @@
-package com.br.Ecoleta.util;
+package com.br.ecoleta.util;
 
 public enum TipoVeiculo {
     CAMINHAO,

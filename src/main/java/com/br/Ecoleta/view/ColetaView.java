@@ -1,14 +1,14 @@
-package com.br.Ecoleta.view;
+package com.br.ecoleta.view;
 
-import com.br.Ecoleta.controller.ColetaController;
-import com.br.Ecoleta.controller.ClienteController;
-import com.br.Ecoleta.controller.PontoDeColetaController;
-import com.br.Ecoleta.controller.RotaController;
-import com.br.Ecoleta.model.Coleta;
-import com.br.Ecoleta.model.Cliente;
-import com.br.Ecoleta.model.PontoDeColeta;
-import com.br.Ecoleta.model.Rota;
-import com.br.Ecoleta.util.ColetaStatus;
+import com.br.ecoleta.controller.ColetaController;
+import com.br.ecoleta.controller.ClienteController;
+import com.br.ecoleta.controller.PontoDeColetaController;
+import com.br.ecoleta.controller.RotaController;
+import com.br.ecoleta.model.Coleta;
+import com.br.ecoleta.model.Cliente;
+import com.br.ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.model.Rota;
+import com.br.ecoleta.util.ColetaStatus;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;

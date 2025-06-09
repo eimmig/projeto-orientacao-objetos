@@ -1,6 +1,6 @@
-package com.br.Ecoleta.repository;
+package com.br.ecoleta.repository;
 
-import com.br.Ecoleta.model.Cliente;
+import com.br.ecoleta.model.Cliente;
 import jakarta.persistence.EntityManager;
 
 public class ClienteRepository extends AbstractJpaRepository<Cliente, Long> {

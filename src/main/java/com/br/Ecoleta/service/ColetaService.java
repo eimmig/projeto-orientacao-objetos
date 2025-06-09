@@ -1,7 +1,7 @@
-package com.br.Ecoleta.service;
+package com.br.ecoleta.service;
 
-import com.br.Ecoleta.model.Coleta;
-import com.br.Ecoleta.repository.ColetaRepository;
+import com.br.ecoleta.model.Coleta;
+import com.br.ecoleta.repository.ColetaRepository;
 
 public class ColetaService extends GenericService<Coleta, Long> {
 

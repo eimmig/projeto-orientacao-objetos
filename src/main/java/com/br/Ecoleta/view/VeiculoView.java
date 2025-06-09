@@ -1,8 +1,8 @@
-package com.br.Ecoleta.view;
+package com.br.ecoleta.view;
 
-import com.br.Ecoleta.controller.VeiculoController;
-import com.br.Ecoleta.model.Veiculo;
-import com.br.Ecoleta.util.TipoVeiculo;
+import com.br.ecoleta.controller.VeiculoController;
+import com.br.ecoleta.model.Veiculo;
+import com.br.ecoleta.util.TipoVeiculo;
 import java.util.Optional;
 import java.util.Scanner;
 

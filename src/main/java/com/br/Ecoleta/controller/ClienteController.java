@@ -1,7 +1,7 @@
-package com.br.Ecoleta.controller;
+package com.br.ecoleta.controller;
 
-import com.br.Ecoleta.model.Cliente;
-import com.br.Ecoleta.service.ClienteService;
+import com.br.ecoleta.model.Cliente;
+import com.br.ecoleta.service.ClienteService;
 
 public class ClienteController extends GenericController<Cliente, Long> {
 

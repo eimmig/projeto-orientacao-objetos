@@ -1,7 +1,7 @@
-package com.br.Ecoleta.service;
+package com.br.ecoleta.service;
 
-import com.br.Ecoleta.model.PontoDeColeta;
-import com.br.Ecoleta.repository.PontoDeColetaRepository;
+import com.br.ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.repository.PontoDeColetaRepository;
 
 public class PontoDeColetaService extends GenericService<PontoDeColeta, Long> {
 

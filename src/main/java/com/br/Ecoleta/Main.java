@@ -1,10 +1,8 @@
-package com.br.Ecoleta;
+package com.br.ecoleta;
 
-import com.br.Ecoleta.controller.*;
-import com.br.Ecoleta.repository.*;
-import com.br.Ecoleta.service.*;
-import com.br.Ecoleta.util.JpaUtil;
-import com.br.Ecoleta.view.*; // Importa o novo pacote de views
+import com.br.ecoleta.util.AppFactory;
+import com.br.ecoleta.util.JpaUtil;
+import com.br.ecoleta.view.*;
 import jakarta.persistence.EntityManager;
 
 import java.util.Scanner;
@@ -17,34 +15,14 @@ public class Main {
 
         try {
             entityManager = JpaUtil.getEntityManager();
+            AppFactory factory = new AppFactory(entityManager, scanner);
 
-            ClienteRepository clienteRepository = new ClienteRepository(entityManager);
-            PontoDeColetaRepository pontoDeColetaRepository = new PontoDeColetaRepository(entityManager);
-            VeiculoRepository veiculoRepository = new VeiculoRepository(entityManager);
-            MotoristaRepository motoristaRepository = new MotoristaRepository(entityManager);
-            RotaRepository rotaRepository = new RotaRepository(entityManager);
-            ColetaRepository coletaRepository = new ColetaRepository(entityManager);
-
-            ClienteService clienteService = new ClienteService(clienteRepository);
-            PontoDeColetaService pontoDeColetaService = new PontoDeColetaService(pontoDeColetaRepository);
-            VeiculoService veiculoService = new VeiculoService(veiculoRepository);
-            MotoristaService motoristaService = new MotoristaService(motoristaRepository);
-            RotaService rotaService = new RotaService(rotaRepository);
-            ColetaService coletaService = new ColetaService(coletaRepository);
-
-            ClienteController clienteController = new ClienteController(clienteService);
-            PontoDeColetaController pontoDeColetaController = new PontoDeColetaController(pontoDeColetaService);
-            VeiculoController veiculoController = new VeiculoController(veiculoService);
-            MotoristaController motoristaController = new MotoristaController(motoristaService);
-            RotaController rotaController = new RotaController(rotaService);
-            ColetaController coletaController = new ColetaController(coletaService);
-
-            ClienteView clienteView = new ClienteView(clienteController, scanner);
-            PontoDeColetaView pontoDeColetaView = new PontoDeColetaView(pontoDeColetaController, clienteController, scanner);
-            VeiculoView veiculoView = new VeiculoView(veiculoController, scanner);
-            MotoristaView motoristaView = new MotoristaView(motoristaController, scanner);
-            RotaView rotaView = new RotaView(rotaController, motoristaController, veiculoController, scanner);
-            ColetaView coletaView = new ColetaView(coletaController, clienteController, pontoDeColetaController, rotaController, scanner);
+            ClienteView clienteView = factory.get(ClienteView.class);
+            PontoDeColetaView pontoDeColetaView = factory.get(PontoDeColetaView.class);
+            VeiculoView veiculoView = factory.get(VeiculoView.class);
+            MotoristaView motoristaView = factory.get(MotoristaView.class);
+            RotaView rotaView = factory.get(RotaView.class);
+            ColetaView coletaView = factory.get(ColetaView.class);
 
             System.out.println("### Sistema Ecoleta - Menu Principal ###");
 

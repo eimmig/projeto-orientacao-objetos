@@ -1,6 +1,6 @@
-package com.br.Ecoleta.repository;
+package com.br.ecoleta.repository;
 
-import com.br.Ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.model.PontoDeColeta;
 import jakarta.persistence.EntityManager;
 
 public class PontoDeColetaRepository extends AbstractJpaRepository<PontoDeColeta, Long> {

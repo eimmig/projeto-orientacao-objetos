@@ -1,7 +1,7 @@
-package com.br.Ecoleta.controller;
+package com.br.ecoleta.controller;
 
-import com.br.Ecoleta.model.Coleta;
-import com.br.Ecoleta.service.ColetaService;
+import com.br.ecoleta.model.Coleta;
+import com.br.ecoleta.service.ColetaService;
 
 public class ColetaController extends GenericController<Coleta, Long> {
 

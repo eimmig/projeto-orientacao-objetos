@@ -1,11 +1,11 @@
-package com.br.Ecoleta.view;
+package com.br.ecoleta.view;
 
-import com.br.Ecoleta.controller.MotoristaController;
-import com.br.Ecoleta.controller.RotaController;
-import com.br.Ecoleta.controller.VeiculoController;
-import com.br.Ecoleta.model.Motorista;
-import com.br.Ecoleta.model.Rota;
-import com.br.Ecoleta.model.Veiculo;
+import com.br.ecoleta.controller.MotoristaController;
+import com.br.ecoleta.controller.RotaController;
+import com.br.ecoleta.controller.VeiculoController;
+import com.br.ecoleta.model.Motorista;
+import com.br.ecoleta.model.Rota;
+import com.br.ecoleta.model.Veiculo;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;

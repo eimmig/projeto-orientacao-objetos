@@ -1,6 +1,6 @@
-package com.br.Ecoleta.service;
+package com.br.ecoleta.service;
 
-import com.br.Ecoleta.repository.GenericRepository;
+import com.br.ecoleta.repository.GenericRepository;
 import java.util.List;
 import java.util.Optional;
 

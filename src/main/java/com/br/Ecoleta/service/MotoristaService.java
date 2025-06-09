@@ -1,7 +1,7 @@
-package com.br.Ecoleta.service;
+package com.br.ecoleta.service;
 
-import com.br.Ecoleta.model.Motorista;
-import com.br.Ecoleta.repository.MotoristaRepository;
+import com.br.ecoleta.model.Motorista;
+import com.br.ecoleta.repository.MotoristaRepository;
 
 public class MotoristaService extends GenericService<Motorista, Long> {
 

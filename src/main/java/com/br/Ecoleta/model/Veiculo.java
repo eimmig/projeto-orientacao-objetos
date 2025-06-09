@@ -1,10 +1,10 @@
-package com.br.Ecoleta.model;
+package com.br.ecoleta.model;
 
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
-import com.br.Ecoleta.util.TipoVeiculo; // Importa o novo Enum
+import com.br.ecoleta.util.TipoVeiculo; // Importa o novo Enum
 
 @Entity
 @Table(name = "veiculos")
@@ -13,9 +13,9 @@ public class Veiculo extends GenericModel {
     @Column(name = "placa", unique = true, nullable = false, length = 10)
     private String placa;
 
-    @Enumerated(EnumType.STRING) // Mapeia o Enum para uma String no banco de dados
-    @Column(name = "modelo", nullable = false, length = 50) // Ajuste o length se necessário para caber o maior nome do Enum
-    private TipoVeiculo modelo; // Agora é do tipo TipoVeiculo
+    @Enumerated(EnumType.STRING)
+    @Column(name = "modelo", nullable = false, length = 50)
+    private TipoVeiculo modelo;
 
     @Column(name = "capacidade_kg", nullable = false)
     private Double capacidadeKg;

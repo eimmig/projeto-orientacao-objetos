@@ -1,7 +1,7 @@
-package com.br.Ecoleta.controller;
+package com.br.ecoleta.controller;
 
-import com.br.Ecoleta.model.Rota;
-import com.br.Ecoleta.service.RotaService;
+import com.br.ecoleta.model.Rota;
+import com.br.ecoleta.service.RotaService;
 
 public class RotaController extends GenericController<Rota, Long> {
 

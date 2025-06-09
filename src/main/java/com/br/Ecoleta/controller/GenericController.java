@@ -1,6 +1,6 @@
-package com.br.Ecoleta.controller;
+package com.br.ecoleta.controller;
 
-import com.br.Ecoleta.service.GenericService;
+import com.br.ecoleta.service.GenericService;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;

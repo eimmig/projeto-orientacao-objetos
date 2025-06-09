@@ -1,16 +1,28 @@
-package com.br.Ecoleta.view;
+package com.br.ecoleta.view;
 
-import com.br.Ecoleta.controller.MotoristaController;
-import com.br.Ecoleta.model.Motorista;
+import com.br.ecoleta.controller.MotoristaController;
+import com.br.ecoleta.controller.VeiculoController;
+import com.br.ecoleta.model.Motorista;
+import com.br.ecoleta.model.Veiculo;
+import com.br.ecoleta.model.Rota;
+import com.br.ecoleta.model.Coleta;
+import com.br.ecoleta.service.RotaService;
+import com.br.ecoleta.service.ColetaService;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class MotoristaView {
     private final MotoristaController motoristaController;
+    private final VeiculoController veiculoController;
+    private final RotaService rotaService;
+    private final ColetaService coletaService;
     private final Scanner scanner;
 
-    public MotoristaView(MotoristaController motoristaController, Scanner scanner) {
+    public MotoristaView(MotoristaController motoristaController, VeiculoController veiculoController, RotaService rotaService, ColetaService coletaService, Scanner scanner) {
         this.motoristaController = motoristaController;
+        this.veiculoController = veiculoController;
+        this.rotaService = rotaService;
+        this.coletaService = coletaService;
         this.scanner = scanner;
     }
 
@@ -23,6 +35,7 @@ public class MotoristaView {
             System.out.println("3. Buscar Motorista por ID");
             System.out.println("4. Atualizar Motorista");
             System.out.println("5. Excluir Motorista");
+            System.out.println("6. Buscar Rota do Dia");
             System.out.println("0. Voltar ao Menu Principal");
 
             System.out.print("Opção: ");
@@ -45,6 +58,9 @@ public class MotoristaView {
                         break;
                     case 5:
                         excluirMotorista();
+                        break;
+                    case 6:
+                        buscarRotaDoDia();
                         break;
                     case 0:
                         System.out.println("Voltando ao Menu Principal.");
@@ -125,5 +141,36 @@ public class MotoristaView {
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
         motoristaController.delete(idDelete);
+    }
+
+    private void buscarRotaDoDia() {
+        System.out.println("\n--- Buscar Rota do Dia ---");
+        System.out.print("Digite o ID do motorista: ");
+        Long motoristaId = scanner.nextLong();
+        scanner.nextLine();
+        System.out.print("Digite o ID do veículo: ");
+        Long veiculoId = scanner.nextLong();
+        scanner.nextLine();
+        var motoristaOpt = motoristaController.getById(motoristaId);
+        var veiculoOpt = veiculoController.getById(veiculoId);
+        if (motoristaOpt.isEmpty() || veiculoOpt.isEmpty()) {
+            System.out.println("Motorista ou veículo não encontrado.");
+            return;
+        }
+        Rota rota = rotaService.buscarOuGerarRotaDoDia(motoristaOpt.get(), veiculoOpt.get(), coletaService);
+        if (rota == null) {
+            System.out.println("Nenhuma rota disponível para hoje para este motorista e veículo.");
+            return;
+        }
+        System.out.println("Rota do dia:");
+        System.out.println(rota);
+        if (rota.getColetas() == null || rota.getColetas().isEmpty()) {
+            System.out.println("Nenhuma coleta atribuída nesta rota.");
+        } else {
+            System.out.println("Coletas nesta rota:");
+            for (Coleta coleta : rota.getColetas()) {
+                System.out.println(coleta);
+            }
+        }
     }
 }

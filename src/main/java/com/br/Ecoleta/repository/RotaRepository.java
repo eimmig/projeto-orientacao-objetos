@@ -1,6 +1,6 @@
-package com.br.Ecoleta.repository;
+package com.br.ecoleta.repository;
 
-import com.br.Ecoleta.model.Rota;
+import com.br.ecoleta.model.Rota;
 import jakarta.persistence.EntityManager;
 
 public class RotaRepository extends AbstractJpaRepository<Rota, Long> {

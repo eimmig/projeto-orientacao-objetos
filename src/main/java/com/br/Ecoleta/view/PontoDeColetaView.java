@@ -1,9 +1,9 @@
-package com.br.Ecoleta.view;
+package com.br.ecoleta.view;
 
-import com.br.Ecoleta.controller.ClienteController;
-import com.br.Ecoleta.controller.PontoDeColetaController;
-import com.br.Ecoleta.model.Cliente;
-import com.br.Ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.controller.ClienteController;
+import com.br.ecoleta.controller.PontoDeColetaController;
+import com.br.ecoleta.model.Cliente;
+import com.br.ecoleta.model.PontoDeColeta;
 import java.util.Optional;
 import java.util.Scanner;
 

@@ -1,6 +1,6 @@
-package com.br.Ecoleta.repository;
+package com.br.ecoleta.repository;
 
-import com.br.Ecoleta.model.Motorista;
+import com.br.ecoleta.model.Motorista;
 import jakarta.persistence.EntityManager;
 
 public class MotoristaRepository extends AbstractJpaRepository<Motorista, Long> {
