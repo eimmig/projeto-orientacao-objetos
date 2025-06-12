@@ -9,12 +9,14 @@ import com.br.ecoleta.model.Cliente;
 import com.br.ecoleta.model.PontoDeColeta;
 import com.br.ecoleta.model.Rota;
 import com.br.ecoleta.util.ColetaStatus;
+import com.br.ecoleta.util.ConsoleUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class ColetaView {
+    private static final String COLETA_COM_ID = "Coleta com ID ";
     private final ColetaController coletaController;
     private final ClienteController clienteController;
     private final PontoDeColetaController pontoDeColetaController;
@@ -32,15 +34,15 @@ public class ColetaView {
     public void exibirMenuColeta() {
         int subOpcao;
         do {
-            System.out.println("\n--- Gerenciar Coletas ---");
-            System.out.println("1. Cadastrar Coleta");
-            System.out.println("2. Listar Todas as Coletas");
-            System.out.println("3. Buscar Coleta por ID");
-            System.out.println("4. Atualizar Coleta");
-            System.out.println("5. Excluir Coleta");
-            System.out.println("0. Voltar ao Menu Principal");
+            ConsoleUtils.println("\n--- Gerenciar Coletas ---");
+            ConsoleUtils.println("1. Cadastrar Coleta");
+            ConsoleUtils.println("2. Listar Todas as Coletas");
+            ConsoleUtils.println("3. Buscar Coleta por ID");
+            ConsoleUtils.println("4. Atualizar Coleta");
+            ConsoleUtils.println("5. Excluir Coleta");
+            ConsoleUtils.println("0. Voltar ao Menu Principal");
 
-            System.out.print("Opção: ");
+            ConsoleUtils.print("Opção");
             subOpcao = scanner.nextInt();
             scanner.nextLine();
 
@@ -62,154 +64,201 @@ public class ColetaView {
                         excluirColeta();
                         break;
                     case 0:
-                        System.out.println("Voltando ao Menu Principal.");
+                        ConsoleUtils.println("Voltando ao Menu Principal.");
                         break;
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        ConsoleUtils.println("Opção inválida. Tente novamente.");
                 }
             } catch (DateTimeParseException e) {
-                System.err.println("Erro: Formato de data/hora inválido. Use YYYY-MM-DDTHH:MM:SS.");
+                ConsoleUtils.printError("Erro: Formato de data/hora inválido. Use YYYY-MM-DDTHH:MM:SS.");
             } catch (IllegalArgumentException e) {
-                System.err.println("Erro: Status de coleta inválido. Por favor, use REALIZADA, PENDENTE ou CANCELADA.");
+                ConsoleUtils.printError("Erro: Status de coleta inválido. Por favor, use REALIZADA, PENDENTE ou CANCELADA.");
             } catch (Exception e) {
-                System.err.println("Erro na operação de coletas: " + e.getMessage());
+                ConsoleUtils.printError("Erro na operação de coletas: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
     private void cadastrarColeta() throws Exception {
-        System.out.println("\n--- Cadastro de Coleta ---");
-        System.out.print("Data e Hora da Coleta (YYYY-MM-DDTHH:MM:SS): ");
+        ConsoleUtils.println("\n--- Cadastro de Coleta ---");
+        ConsoleUtils.print("Data e Hora da Coleta (YYYY-MM-DDTHH:MM:SS)");
         String dataHoraStr = scanner.nextLine();
         LocalDateTime dataHoraColeta = LocalDateTime.parse(dataHoraStr);
-
-        System.out.print("Quantidade (KG): ");
+        ConsoleUtils.print("Quantidade (KG)");
         Double quantidadeKg = scanner.nextDouble();
         scanner.nextLine();
-
-        System.out.print("Observações (opcional): ");
+        ConsoleUtils.print("Observações (opcional)");
         String observacoes = scanner.nextLine();
-
-        System.out.print("Status (REALIZADA, PENDENTE, CANCELADA): ");
+        ConsoleUtils.print("Status (REALIZADA, PENDENTE, CANCELADA)");
         String statusStr = scanner.nextLine().toUpperCase();
         ColetaStatus status = ColetaStatus.valueOf(statusStr);
-
-        System.out.print("ID do Cliente: ");
+        ConsoleUtils.print("ID do Cliente");
         Long clienteId = scanner.nextLong();
         scanner.nextLine();
-
-        System.out.print("ID do Ponto de Coleta: ");
+        ConsoleUtils.print("ID do Ponto de Coleta");
         Long pontoColetaId = scanner.nextLong();
         scanner.nextLine();
-
-        System.out.print("ID da Rota (Opcional, 0 se não houver): ");
+        ConsoleUtils.print("ID da Rota (Opcional, 0 se não houver)");
         Long rotaIdInput = scanner.nextLong();
         scanner.nextLine();
         Long rotaId = rotaIdInput == 0 ? null : rotaIdInput;
-
         Optional<Cliente> clienteOpt = clienteController.getById(clienteId);
         Optional<PontoDeColeta> pontoOpt = pontoDeColetaController.getById(pontoColetaId);
         Optional<Rota> rotaOpt = (rotaId != null) ? rotaController.getById(rotaId) : Optional.empty();
-
         if (clienteOpt.isPresent() && pontoOpt.isPresent() && (rotaId == null || rotaOpt.isPresent())) {
             Coleta novaColeta = new Coleta(dataHoraColeta, quantidadeKg, observacoes, status, clienteOpt.get(), pontoOpt.get(), rotaOpt.orElse(null));
             coletaController.save(novaColeta);
+            ConsoleUtils.printSuccess("Coleta cadastrada com sucesso!");
         } else {
-            System.out.println("Cliente, Ponto de Coleta ou Rota não encontrado. Operação cancelada.");
+            if (clienteOpt.isEmpty()) {
+                ConsoleUtils.printError("Cliente com ID " + clienteId + " não encontrado. Cadastro de coleta cancelado.");
+            }
+            if (pontoOpt.isEmpty()) {
+                ConsoleUtils.printError("Ponto de Coleta com ID " + pontoColetaId + " não encontrado. Cadastro de coleta cancelado.");
+            }
+            if (rotaId != null && rotaOpt.isEmpty()) {
+                ConsoleUtils.printError("Rota com ID " + rotaId + " não encontrada. Cadastro de coleta cancelado.");
+            }
         }
     }
 
     private void listarTodasColetas() {
-        System.out.println("\n--- Todas as Coletas ---");
-        coletaController.getAll();
+        ConsoleUtils.println("\n--- Todas as Coletas ---");
+        var coletas = coletaController.getAll();
+        if (coletas.isEmpty()) {
+            ConsoleUtils.printInfo("Nenhuma coleta cadastrada no sistema.");
+        } else {
+            coletas.forEach(coleta -> ConsoleUtils.println(coleta.toString()));
+        }
     }
 
     private void buscarColetaPorId() {
-        System.out.println("\n--- Buscar Coleta por ID ---");
-        System.out.print("Digite o ID da coleta: ");
+        ConsoleUtils.println("\n--- Buscar Coleta por ID ---");
+        ConsoleUtils.print("Digite o ID da coleta");
         Long idBusca = scanner.nextLong();
         scanner.nextLine();
-        coletaController.getById(idBusca);
+        Optional<Coleta> coletaOpt = coletaController.getById(idBusca);
+        if (coletaOpt.isPresent()) {
+            ConsoleUtils.printDivider();
+            ConsoleUtils.println(coletaOpt.get().toString());
+            ConsoleUtils.printDivider();
+            ConsoleUtils.printError(COLETA_COM_ID + idBusca + " não encontrada.");
+        }
     }
 
     private void atualizarColeta() throws Exception {
-        System.out.println("\n--- Atualizar Coleta ---");
-        System.out.print("Digite o ID da coleta a ser atualizada: ");
+        ConsoleUtils.println("\n--- Atualizar Coleta ---");
+        ConsoleUtils.print("Digite o ID da coleta a ser atualizada");
         Long idUpdate = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Coleta> coletaExistenteOpt = coletaController.getById(idUpdate);
         if (coletaExistenteOpt.isPresent()) {
             Coleta coletaExistente = coletaExistenteOpt.get();
-            System.out.println("Coleta encontrada. Digite os novos dados (deixe em branco para manter o atual):");
-
-            System.out.print("Nova Data e Hora (" + coletaExistente.getDataHoraColeta() + ") (YYYY-MM-DDTHH:MM:SS): ");
-            String novaDataHoraStr = scanner.nextLine();
-            if (!novaDataHoraStr.trim().isEmpty()) coletaExistente.setDataHoraColeta(LocalDateTime.parse(novaDataHoraStr));
-
-            System.out.print("Nova Quantidade (KG) (" + coletaExistente.getQuantidadeKg() + "): ");
-            String novaQuantStr = scanner.nextLine();
-            if (!novaQuantStr.trim().isEmpty()) coletaExistente.setQuantidadeKg(Double.parseDouble(novaQuantStr));
-
-            System.out.print("Novas Observações (" + coletaExistente.getObservacoes() + "): ");
-            String novasObs = scanner.nextLine();
-            if (!novasObs.trim().isEmpty()) coletaExistente.setObservacoes(novasObs);
-
-            System.out.print("Novo Status (" + coletaExistente.getStatus() + ") (REALIZADA, PENDENTE, CANCELADA): ");
-            String novoStatusStr = scanner.nextLine().toUpperCase();
-            if (!novoStatusStr.trim().isEmpty()) coletaExistente.setStatus(ColetaStatus.valueOf(novoStatusStr));
-
-            System.out.print("Novo ID do Cliente (" + (coletaExistente.getCliente() != null ? coletaExistente.getCliente().getId() : "null") + "): ");
-            String novoClienteIdStr = scanner.nextLine();
-            if (!novoClienteIdStr.trim().isEmpty()) {
-                Long novoClienteId = Long.parseLong(novoClienteIdStr);
-                Optional<Cliente> novoClienteOpt = clienteController.getById(novoClienteId);
-                if (novoClienteOpt.isPresent()) {
-                    coletaExistente.setCliente(novoClienteOpt.get());
-                } else {
-                    System.out.println("Cliente com ID " + novoClienteId + " não encontrado. Cliente não será atualizado.");
-                }
-            }
-
-            System.out.print("Novo ID do Ponto de Coleta (" + (coletaExistente.getPontoDeColeta() != null ? coletaExistente.getPontoDeColeta().getId() : "null") + "): ");
-            String novoPontoIdStr = scanner.nextLine();
-            if (!novoPontoIdStr.trim().isEmpty()) {
-                Long novoPontoId = Long.parseLong(novoPontoIdStr);
-                Optional<PontoDeColeta> novoPontoOpt = pontoDeColetaController.getById(novoPontoId);
-                if (novoPontoOpt.isPresent()) {
-                    coletaExistente.setPontoDeColeta(novoPontoOpt.get());
-                } else {
-                    System.out.println("Ponto de Coleta com ID " + novoPontoId + " não encontrado. Ponto de Coleta não será atualizado.");
-                }
-            }
-
-            System.out.print("Novo ID da Rota (" + (coletaExistente.getRota() != null ? coletaExistente.getRota().getId() : "null") + ") (0 para remover): ");
-            String novaRotaIdStr = scanner.nextLine();
-            if (!novaRotaIdStr.trim().isEmpty()) {
-                Long novaRotaId = Long.parseLong(novaRotaIdStr);
-                if (novaRotaId == 0) {
-                    coletaExistente.setRota(null);
-                } else {
-                    Optional<Rota> novaRotaOpt = rotaController.getById(novaRotaId);
-                    if (novaRotaOpt.isPresent()) {
-                        coletaExistente.setRota(novaRotaOpt.get());
-                    } else {
-                        System.out.println("Rota com ID " + novaRotaId + " não encontrada. Rota não será atualizada.");
-                    }
-                }
-            }
-
+            ConsoleUtils.println("Coleta encontrada. Digite os novos dados (deixe em branco para manter o atual):");
+            atualizarDataHoraColeta(coletaExistente);
+            atualizarQuantidadeKg(coletaExistente);
+            atualizarObservacoes(coletaExistente);
+            atualizarStatus(coletaExistente);
+            atualizarCliente(coletaExistente);
+            atualizarPontoDeColeta(coletaExistente);
+            atualizarRota(coletaExistente);
             coletaController.update(idUpdate, coletaExistente);
-        } else {
-            System.out.println("Coleta com ID " + idUpdate + " não encontrada.");
+            ConsoleUtils.printSuccess("Coleta atualizada com sucesso!");
+            ConsoleUtils.printError(COLETA_COM_ID + idUpdate + " não encontrada. Não foi possível atualizar.");
+        }
+    }
+
+    private void atualizarDataHoraColeta(Coleta coleta) {
+        ConsoleUtils.print("Nova Data e Hora (" + coleta.getDataHoraColeta() + ") (YYYY-MM-DDTHH:MM:SS)");
+        String novaDataHoraStr = scanner.nextLine();
+        if (!novaDataHoraStr.trim().isEmpty()) {
+            coleta.setDataHoraColeta(LocalDateTime.parse(novaDataHoraStr));
+        }
+    }
+
+    private void atualizarQuantidadeKg(Coleta coleta) {
+        ConsoleUtils.print("Nova Quantidade (KG) (" + coleta.getQuantidadeKg() + ")");
+        String novaQuantidadeStr = scanner.nextLine();
+        if (!novaQuantidadeStr.trim().isEmpty()) {
+            coleta.setQuantidadeKg(Double.parseDouble(novaQuantidadeStr));
+        }
+    }
+
+    private void atualizarObservacoes(Coleta coleta) {
+        ConsoleUtils.print("Novas Observações (" + coleta.getObservacoes() + ")");
+        String novasObservacoes = scanner.nextLine();
+        if (!novasObservacoes.trim().isEmpty()) {
+            coleta.setObservacoes(novasObservacoes);
+        }
+    }
+
+    private void atualizarStatus(Coleta coleta) {
+        ConsoleUtils.print("Novo Status (" + coleta.getStatus() + ") (REALIZADA, PENDENTE, CANCELADA)");
+        String novoStatusStr = scanner.nextLine().toUpperCase();
+        if (!novoStatusStr.trim().isEmpty()) {
+            coleta.setStatus(ColetaStatus.valueOf(novoStatusStr));
+        }
+    }
+
+    private void atualizarCliente(Coleta coleta) {
+        ConsoleUtils.print("Novo ID do Cliente (" + coleta.getCliente().getId() + ")");
+        String novoClienteIdStr = scanner.nextLine();
+        if (!novoClienteIdStr.trim().isEmpty()) {
+            Long novoClienteId = Long.parseLong(novoClienteIdStr);
+            Optional<Cliente> novoClienteOpt = clienteController.getById(novoClienteId);
+            if (novoClienteOpt.isPresent()) {
+                coleta.setCliente(novoClienteOpt.get());
+            } else {
+                ConsoleUtils.println("Cliente com ID " + novoClienteId + " não encontrado. Cliente não será atualizado.");
+            }
+        }
+    }
+
+    private void atualizarPontoDeColeta(Coleta coleta) {
+        ConsoleUtils.print("Novo ID do Ponto de Coleta (" + coleta.getPontoDeColeta().getId() + ")");
+        String novoPontoIdStr = scanner.nextLine();
+        if (!novoPontoIdStr.trim().isEmpty()) {
+            Long novoPontoId = Long.parseLong(novoPontoIdStr);
+            Optional<PontoDeColeta> novoPontoOpt = pontoDeColetaController.getById(novoPontoId);
+            if (novoPontoOpt.isPresent()) {
+                coleta.setPontoDeColeta(novoPontoOpt.get());
+            } else {
+                ConsoleUtils.println("Ponto de Coleta com ID " + novoPontoId + " não encontrado. Ponto não será atualizado.");
+            }
+        }
+    }
+
+    private void atualizarRota(Coleta coleta) {
+        ConsoleUtils.print("Novo ID da Rota (" + (coleta.getRota() != null ? coleta.getRota().getId() : "null") + ") (Opcional, 0 se não houver)");
+        String novaRotaIdStr = scanner.nextLine();
+        if (!novaRotaIdStr.trim().isEmpty()) {
+            Long novaRotaId = Long.parseLong(novaRotaIdStr);
+            if (novaRotaId == 0) {
+                coleta.setRota(null);
+            } else {
+                Optional<Rota> novaRotaOpt = rotaController.getById(novaRotaId);
+                if (novaRotaOpt.isPresent()) {
+                    coleta.setRota(novaRotaOpt.get());
+                } else {
+                    ConsoleUtils.println("Rota com ID " + novaRotaId + " não encontrada. Rota não será atualizada.");
+                }
+            }
         }
     }
 
     private void excluirColeta() {
-        System.out.println("\n--- Excluir Coleta ---");
-        System.out.print("Digite o ID da coleta a ser excluída: ");
+        ConsoleUtils.println("\n--- Excluir Coleta ---");
+        ConsoleUtils.print("Digite o ID da coleta a ser excluída");
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
-        coletaController.delete(idDelete);
+        Optional<Coleta> coletaOpt = coletaController.getById(idDelete);
+        if (coletaOpt.isPresent()) {
+            if (coletaController.delete(idDelete)) {
+                ConsoleUtils.printSuccess("Coleta excluída com sucesso!");
+            } else {
+                ConsoleUtils.printError("Não foi possível excluir a coleta. Tente novamente ou verifique se a coleta está vinculada a outros registros.");
+            }
+            ConsoleUtils.printError(COLETA_COM_ID + idDelete + " não encontrada. Não foi possível excluir.");
+        }
     }
 }

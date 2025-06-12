@@ -2,12 +2,15 @@ package com.br.ecoleta.view;
 
 import com.br.ecoleta.controller.ClienteController;
 import com.br.ecoleta.controller.PontoDeColetaController;
+import com.br.ecoleta.exception.ValidationException;
 import com.br.ecoleta.model.Cliente;
 import com.br.ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.util.ConsoleUtils;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class PontoDeColetaView {
+    private static final String PONTO_COLETA_ID_MSG = "Ponto de Coleta com ID ";
     private final PontoDeColetaController pontoDeColetaController;
     private final ClienteController clienteController;
     private final Scanner scanner;
@@ -21,15 +24,15 @@ public class PontoDeColetaView {
     public void exibirMenuPontoDeColeta() {
         int subOpcao;
         do {
-            System.out.println("\n--- Gerenciar Pontos de Coleta ---");
-            System.out.println("1. Cadastrar Ponto de Coleta");
-            System.out.println("2. Listar Todos os Pontos de Coleta");
-            System.out.println("3. Buscar Ponto de Coleta por ID");
-            System.out.println("4. Atualizar Ponto de Coleta");
-            System.out.println("5. Excluir Ponto de Coleta");
-            System.out.println("0. Voltar ao Menu Principal");
+            ConsoleUtils.println("\n--- Gerenciar Pontos de Coleta ---");
+            ConsoleUtils.println("1. Cadastrar Ponto de Coleta");
+            ConsoleUtils.println("2. Listar Todos os Pontos de Coleta");
+            ConsoleUtils.println("3. Buscar Ponto de Coleta por ID");
+            ConsoleUtils.println("4. Atualizar Ponto de Coleta");
+            ConsoleUtils.println("5. Excluir Ponto de Coleta");
+            ConsoleUtils.println("0. Voltar ao Menu Principal");
 
-            System.out.print("Opção: ");
+            ConsoleUtils.print("Opção");
             subOpcao = scanner.nextInt();
             scanner.nextLine();
 
@@ -51,105 +54,154 @@ public class PontoDeColetaView {
                         excluirPontoDeColeta();
                         break;
                     case 0:
-                        System.out.println("Voltando ao Menu Principal.");
+                        ConsoleUtils.println("Voltando ao Menu Principal.");
                         break;
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        ConsoleUtils.println("Opção inválida. Tente novamente.");
                 }
             } catch (Exception e) {
-                System.err.println("Erro na operação de pontos de coleta: " + e.getMessage());
+                ConsoleUtils.printError("Erro na operação de pontos de coleta: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
     private void cadastrarPontoDeColeta() throws Exception {
-        System.out.println("\n--- Cadastro de Ponto de Coleta ---");
-        System.out.print("Nome do Local: ");
+        ConsoleUtils.println("\n--- Cadastro de Ponto de Coleta ---");
+        ConsoleUtils.print("Nome do Local");
         String nomeLocal = scanner.nextLine();
-        System.out.print("Endereço: ");
+        if (nomeLocal.trim().isEmpty()) {
+            ConsoleUtils.printError("O nome do local não pode estar vazio. Por favor, preencha corretamente.");
+            throw new ValidationException("Nome do local não pode estar vazio");
+        }
+        ConsoleUtils.print("Endereço");
         String endereco = scanner.nextLine();
-        System.out.print("Latitude: ");
+        if (endereco.trim().isEmpty()) {
+            ConsoleUtils.printError("O endereço não pode estar vazio. Por favor, preencha corretamente.");
+            throw new ValidationException("Endereço não pode estar vazio");
+        }
+        ConsoleUtils.print("Latitude");
         Double latitude = scanner.nextDouble();
-        System.out.print("Longitude: ");
+        ConsoleUtils.print("Longitude");
         Double longitude = scanner.nextDouble();
         scanner.nextLine();
-
-        System.out.print("ID do Cliente responsável: ");
+        ConsoleUtils.print("ID do Cliente responsável");
         Long clienteId = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Cliente> clienteOpt = clienteController.getById(clienteId);
         if (clienteOpt.isPresent()) {
             PontoDeColeta novoPonto = new PontoDeColeta(nomeLocal, endereco, latitude, longitude, clienteOpt.get());
             pontoDeColetaController.save(novoPonto);
+            ConsoleUtils.printSuccess("Ponto de Coleta cadastrado com sucesso!");
         } else {
-            System.out.println("Cliente com ID " + clienteId + " não encontrado. Operação cancelada.");
+            ConsoleUtils.printError("Cliente com ID " + clienteId + " não encontrado. Cadastro de ponto de coleta cancelado.");
         }
     }
 
     private void listarTodosPontosDeColeta() {
-        System.out.println("\n--- Todos os Pontos de Coleta ---");
-        pontoDeColetaController.getAll();
+        ConsoleUtils.println("\n--- Todos os Pontos de Coleta ---");
+        var pontos = pontoDeColetaController.getAll();
+        if (pontos.isEmpty()) {
+            ConsoleUtils.printInfo("Nenhum ponto de coleta cadastrado no sistema.");
+        } else {
+            pontos.forEach(ponto -> ConsoleUtils.println(ponto.toString()));
+        }
     }
 
     private void buscarPontoDeColetaPorId() {
-        System.out.println("\n--- Buscar Ponto de Coleta por ID ---");
-        System.out.print("Digite o ID do ponto de coleta: ");
+        ConsoleUtils.println("\n--- Buscar Ponto de Coleta por ID ---");
+        ConsoleUtils.print("Digite o ID do ponto de coleta");
         Long idBusca = scanner.nextLong();
         scanner.nextLine();
-        pontoDeColetaController.getById(idBusca);
+        Optional<PontoDeColeta> pontoOpt = pontoDeColetaController.getById(idBusca);
+        if (pontoOpt.isPresent()) {
+            ConsoleUtils.printDivider();
+            ConsoleUtils.println(pontoOpt.get().toString());
+            ConsoleUtils.printDivider();
+            ConsoleUtils.printError(PONTO_COLETA_ID_MSG + idBusca + " não encontrado.");
+        }
     }
 
     private void atualizarPontoDeColeta() throws Exception {
-        System.out.println("\n--- Atualizar Ponto de Coleta ---");
-        System.out.print("Digite o ID do ponto de coleta a ser atualizado: ");
+        ConsoleUtils.println("\n--- Atualizar Ponto de Coleta ---");
+        ConsoleUtils.print("Digite o ID do ponto de coleta a ser atualizado");
         Long idUpdate = scanner.nextLong();
         scanner.nextLine();
-
         Optional<PontoDeColeta> pontoExistenteOpt = pontoDeColetaController.getById(idUpdate);
         if (pontoExistenteOpt.isPresent()) {
             PontoDeColeta pontoExistente = pontoExistenteOpt.get();
-            System.out.println("Ponto de Coleta encontrado. Digite os novos dados (deixe em branco para manter o atual):");
+            ConsoleUtils.println("Ponto de Coleta encontrado. Digite os novos dados (deixe em branco para manter o atual):");
 
-            System.out.print("Novo Nome do Local (" + pontoExistente.getNomeLocal() + "): ");
-            String novoNomeLocal = scanner.nextLine();
-            if (!novoNomeLocal.trim().isEmpty()) pontoExistente.setNomeLocal(novoNomeLocal);
-
-            System.out.print("Novo Endereço (" + pontoExistente.getEndereco() + "): ");
-            String novoEndereco = scanner.nextLine();
-            if (!novoEndereco.trim().isEmpty()) pontoExistente.setEndereco(novoEndereco);
-
-            System.out.print("Nova Latitude (" + pontoExistente.getLatitude() + "): ");
-            String latStr = scanner.nextLine();
-            if (!latStr.trim().isEmpty()) pontoExistente.setLatitude(Double.parseDouble(latStr));
-
-            System.out.print("Nova Longitude (" + pontoExistente.getLongitude() + "): ");
-            String longStr = scanner.nextLine();
-            if (!longStr.trim().isEmpty()) pontoExistente.setLongitude(Double.parseDouble(longStr));
-
-            System.out.print("Novo ID do Cliente (" + pontoExistente.getCliente().getId() + "): ");
-            String clienteIdStr = scanner.nextLine();
-            if (!clienteIdStr.trim().isEmpty()) {
-                Long novoClienteId = Long.parseLong(clienteIdStr);
-                Optional<Cliente> novoClienteOpt = clienteController.getById(novoClienteId);
-                if (novoClienteOpt.isPresent()) {
-                    pontoExistente.setCliente(novoClienteOpt.get());
-                } else {
-                    System.out.println("Cliente com ID " + novoClienteId + " não encontrado. Cliente não será atualizado.");
-                }
-            }
+            atualizarNomeLocal(pontoExistente);
+            atualizarEndereco(pontoExistente);
+            atualizarLatitude(pontoExistente);
+            atualizarLongitude(pontoExistente);
+            atualizarCliente(pontoExistente);
 
             pontoDeColetaController.update(idUpdate, pontoExistente);
-        } else {
-            System.out.println("Ponto de Coleta com ID " + idUpdate + " não encontrado.");
+            ConsoleUtils.printSuccess("Ponto de Coleta atualizado com sucesso!");
+            ConsoleUtils.printError(PONTO_COLETA_ID_MSG + idUpdate + " não encontrado. Não foi possível atualizar.");
+        }
+    }
+
+    private void atualizarNomeLocal(PontoDeColeta ponto) {
+        ConsoleUtils.print("Novo Nome do Local (" + ponto.getNomeLocal() + ")");
+        String novoNomeLocal = scanner.nextLine();
+        if (!novoNomeLocal.trim().isEmpty()) {
+            ponto.setNomeLocal(novoNomeLocal);
+        }
+    }
+
+    private void atualizarEndereco(PontoDeColeta ponto) {
+        ConsoleUtils.print("Novo Endereço (" + ponto.getEndereco() + ")");
+        String novoEndereco = scanner.nextLine();
+        if (!novoEndereco.trim().isEmpty()) {
+            ponto.setEndereco(novoEndereco);
+        }
+    }
+
+    private void atualizarLatitude(PontoDeColeta ponto) {
+        ConsoleUtils.print("Nova Latitude (" + ponto.getLatitude() + ")");
+        String latStr = scanner.nextLine();
+        if (!latStr.trim().isEmpty()) {
+            ponto.setLatitude(Double.parseDouble(latStr));
+        }
+    }
+
+    private void atualizarLongitude(PontoDeColeta ponto) {
+        ConsoleUtils.print("Nova Longitude (" + ponto.getLongitude() + ")");
+        String longStr = scanner.nextLine();
+        if (!longStr.trim().isEmpty()) {
+            ponto.setLongitude(Double.parseDouble(longStr));
+        }
+    }
+
+    private void atualizarCliente(PontoDeColeta ponto) throws Exception {
+        ConsoleUtils.print("Novo ID do Cliente (" + ponto.getCliente().getId() + ")");
+        String clienteIdStr = scanner.nextLine();
+        if (!clienteIdStr.trim().isEmpty()) {
+            Long novoClienteId = Long.parseLong(clienteIdStr);
+            Optional<Cliente> novoClienteOpt = clienteController.getById(novoClienteId);
+            if (novoClienteOpt.isPresent()) {
+                ponto.setCliente(novoClienteOpt.get());
+            } else {
+                ConsoleUtils.println("Cliente com ID " + novoClienteId + " não encontrado. Cliente não será atualizado.");
+            }
         }
     }
 
     private void excluirPontoDeColeta() {
-        System.out.println("\n--- Excluir Ponto de Coleta ---");
-        System.out.print("Digite o ID do ponto de coleta a ser excluído: ");
+        ConsoleUtils.println("\n--- Excluir Ponto de Coleta ---");
+        ConsoleUtils.print("Digite o ID do ponto de coleta a ser excluído");
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
-        pontoDeColetaController.delete(idDelete);
+        Optional<PontoDeColeta> pontoOpt = pontoDeColetaController.getById(idDelete);
+        if (pontoOpt.isPresent()) {
+            if (pontoDeColetaController.delete(idDelete)) {
+                ConsoleUtils.printSuccess("Ponto de Coleta excluído com sucesso!");
+            } else {
+                ConsoleUtils.printError("Não foi possível excluir o ponto de coleta. Tente novamente ou verifique se o ponto está vinculado a outros registros.");
+            }
+            ConsoleUtils.printError(PONTO_COLETA_ID_MSG + idDelete + " não encontrado. Não foi possível excluir.");
+        }
     }
 }

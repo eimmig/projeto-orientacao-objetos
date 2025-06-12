@@ -6,11 +6,11 @@ import com.br.ecoleta.exception.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GenericService<T, ID> {
+public abstract class GenericService<T, D> {
 
-    protected final GenericRepository<T, ID> repository;
+    protected final GenericRepository<T, D> repository;
 
-    public GenericService(GenericRepository<T, ID> repository) {
+    protected GenericService(GenericRepository<T, D> repository) {
         this.repository = repository;
     }
 
@@ -26,11 +26,11 @@ public abstract class GenericService<T, ID> {
         return repository.findAll();
     }
 
-    public Optional<T> getById(ID id) {
+    public Optional<T> getById(D id) {
         return repository.findById(id);
     }
 
-    public boolean delete(ID id) throws EntityNotFoundException {
+    public boolean delete(D id) throws EntityNotFoundException {
         if (repository.existsById(id)) {
             try {
                 repository.deleteById(id);
@@ -42,7 +42,7 @@ public abstract class GenericService<T, ID> {
         throw new EntityNotFoundException(getEntityType(), (Long) id);
     }
 
-    public T update(ID id, T updatedItem) throws EntityNotFoundException, ValidationException {
+    public T update(D id, T updatedItem) throws EntityNotFoundException, ValidationException {
         if (repository.existsById(id)) {
             try {
                 return repository.update(updatedItem);

@@ -6,10 +6,13 @@ import com.br.ecoleta.model.Motorista;
 import com.br.ecoleta.model.Rota;
 import com.br.ecoleta.model.Coleta;
 import com.br.ecoleta.service.RotaService;
+import com.br.ecoleta.util.ConsoleUtils;
+import com.br.ecoleta.exception.ValidationException;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class MotoristaView {
+    private static final String MOTORISTA_ID_MSG = "Motorista com ID ";
     private final MotoristaController motoristaController;
     private final VeiculoController veiculoController;
     private final RotaService rotaService;
@@ -25,16 +28,16 @@ public class MotoristaView {
     public void exibirMenuMotorista() {
         int subOpcao;
         do {
-            System.out.println("\n--- Gerenciar Motoristas ---");
-            System.out.println("1. Cadastrar Motorista");
-            System.out.println("2. Listar Todos os Motoristas");
-            System.out.println("3. Buscar Motorista por ID");
-            System.out.println("4. Atualizar Motorista");
-            System.out.println("5. Excluir Motorista");
-            System.out.println("6. Buscar Rota do Dia");
-            System.out.println("0. Voltar ao Menu Principal");
+            ConsoleUtils.println("\n--- Gerenciar Motoristas ---");
+            ConsoleUtils.println("1. Cadastrar Motorista");
+            ConsoleUtils.println("2. Listar Todos os Motoristas");
+            ConsoleUtils.println("3. Buscar Motorista por ID");
+            ConsoleUtils.println("4. Atualizar Motorista");
+            ConsoleUtils.println("5. Excluir Motorista");
+            ConsoleUtils.println("6. Buscar Rota do Dia");
+            ConsoleUtils.println("0. Voltar ao Menu Principal");
 
-            System.out.print("Opção: ");
+            ConsoleUtils.print("Opção");
             subOpcao = scanner.nextInt();
             scanner.nextLine();
 
@@ -59,113 +62,142 @@ public class MotoristaView {
                         buscarRotaDoDia();
                         break;
                     case 0:
-                        System.out.println("Voltando ao Menu Principal.");
+                        ConsoleUtils.println("Voltando ao Menu Principal.");
                         break;
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        ConsoleUtils.println("Opção inválida. Tente novamente.");
                 }
             } catch (Exception e) {
-                System.err.println("Erro na operação de motoristas: " + e.getMessage());
+                ConsoleUtils.printError("Erro na operação de motoristas: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
     private void cadastrarMotorista() throws Exception {
-        System.out.println("\n--- Cadastro de Motorista ---");
-        System.out.print("Nome: ");
+        ConsoleUtils.println("\n--- Cadastro de Motorista ---");
+        ConsoleUtils.print("Nome");
         String nome = scanner.nextLine();
-        System.out.print("CPF: ");
+        if (nome.trim().isEmpty()) {
+            ConsoleUtils.printError("O nome do motorista não pode estar vazio. Por favor, preencha corretamente.");
+            throw new ValidationException("Nome não pode estar vazio");
+        }
+        ConsoleUtils.print("CPF");
         String cpf = scanner.nextLine();
-        System.out.print("CNH: ");
+        if (cpf.trim().isEmpty()) {
+            ConsoleUtils.printError("O CPF do motorista não pode estar vazio. Por favor, preencha corretamente.");
+            throw new ValidationException("CPF não pode estar vazio");
+        }
+        ConsoleUtils.print("CNH");
         String cnh = scanner.nextLine();
-        System.out.print("Telefone: ");
+        if (cnh.trim().isEmpty()) {
+            ConsoleUtils.printError("A CNH do motorista não pode estar vazia. Por favor, preencha corretamente.");
+            throw new ValidationException("CNH não pode estar vazia");
+        }
+        ConsoleUtils.print("Telefone");
         String telefone = scanner.nextLine();
-
+        if (telefone.trim().isEmpty()) {
+            ConsoleUtils.printError("O telefone do motorista não pode estar vazio. Por favor, preencha corretamente.");
+            throw new ValidationException("Telefone não pode estar vazio");
+        }
         Motorista novoMotorista = new Motorista(nome, cpf, cnh, telefone);
         motoristaController.save(novoMotorista);
+        ConsoleUtils.printSuccess("Motorista cadastrado com sucesso!");
     }
 
     private void listarTodosMotoristas() {
-        System.out.println("\n--- Todos os Motoristas ---");
-        motoristaController.getAll();
+        ConsoleUtils.println("\n--- Todos os Motoristas ---");
+        var motoristas = motoristaController.getAll();
+        if (motoristas.isEmpty()) {
+            ConsoleUtils.printInfo("Nenhum motorista cadastrado no sistema.");
+        } else {
+            motoristas.forEach(motorista -> ConsoleUtils.println(motorista.toString()));
+        }
     }
 
     private void buscarMotoristaPorId() {
-        System.out.println("\n--- Buscar Motorista por ID ---");
-        System.out.print("Digite o ID do motorista: ");
+        ConsoleUtils.println("\n--- Buscar Motorista por ID ---");
+        ConsoleUtils.print("Digite o ID do motorista");
         Long idBusca = scanner.nextLong();
         scanner.nextLine();
-        motoristaController.getById(idBusca);
+        Optional<Motorista> motoristaOpt = motoristaController.getById(idBusca);
+        if (motoristaOpt.isPresent()) {
+            ConsoleUtils.printDivider();
+            ConsoleUtils.println(motoristaOpt.get().toString());
+            ConsoleUtils.printDivider();
+            ConsoleUtils.printError(MOTORISTA_ID_MSG + idBusca + " não encontrado.");
+        }
     }
 
     private void atualizarMotorista() throws Exception {
-        System.out.println("\n--- Atualizar Motorista ---");
-        System.out.print("Digite o ID do motorista a ser atualizado: ");
+        ConsoleUtils.println("\n--- Atualizar Motorista ---");
+        ConsoleUtils.print("Digite o ID do motorista a ser atualizado");
         Long idUpdate = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Motorista> motoristaExistenteOpt = motoristaController.getById(idUpdate);
         if (motoristaExistenteOpt.isPresent()) {
             Motorista motoristaExistente = motoristaExistenteOpt.get();
-            System.out.println("Motorista encontrado. Digite os novos dados (deixe em branco para manter o atual):");
-
-            System.out.print("Novo Nome (" + motoristaExistente.getNome() + "): ");
+            ConsoleUtils.println("Motorista encontrado. Digite os novos dados (deixe em branco para manter o atual):");
+            ConsoleUtils.print("Novo Nome (" + motoristaExistente.getNome() + ")");
             String novoNome = scanner.nextLine();
             if (!novoNome.trim().isEmpty()) motoristaExistente.setNome(novoNome);
-
-            System.out.print("Novo CPF (" + motoristaExistente.getCpf() + "): ");
+            ConsoleUtils.print("Novo CPF (" + motoristaExistente.getCpf() + ")");
             String novoCpf = scanner.nextLine();
             if (!novoCpf.trim().isEmpty()) motoristaExistente.setCpf(novoCpf);
-
-            System.out.print("Nova CNH (" + motoristaExistente.getCnh() + "): ");
+            ConsoleUtils.print("Nova CNH (" + motoristaExistente.getCnh() + ")");
             String novaCnh = scanner.nextLine();
             if (!novaCnh.trim().isEmpty()) motoristaExistente.setCnh(novaCnh);
-
-            System.out.print("Novo Telefone (" + motoristaExistente.getTelefone() + "): ");
+            ConsoleUtils.print("Novo Telefone (" + motoristaExistente.getTelefone() + ")");
             String novoTelefone = scanner.nextLine();
             if (!novoTelefone.trim().isEmpty()) motoristaExistente.setTelefone(novoTelefone);
-
             motoristaController.update(idUpdate, motoristaExistente);
-        } else {
-            System.out.println("Motorista com ID " + idUpdate + " não encontrado.");
+            ConsoleUtils.printSuccess("Motorista atualizado com sucesso!");
+            ConsoleUtils.printError(MOTORISTA_ID_MSG + idUpdate + " não encontrado. Não foi possível atualizar.");
         }
     }
 
     private void excluirMotorista() {
-        System.out.println("\n--- Excluir Motorista ---");
-        System.out.print("Digite o ID do motorista a ser excluído: ");
+        ConsoleUtils.println("\n--- Excluir Motorista ---");
+        ConsoleUtils.print("Digite o ID do motorista a ser excluído");
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
-        motoristaController.delete(idDelete);
+        Optional<Motorista> motoristaOpt = motoristaController.getById(idDelete);
+        if (motoristaOpt.isPresent()) {
+            if (motoristaController.delete(idDelete)) {
+                ConsoleUtils.printSuccess("Motorista excluído com sucesso!");
+            } else {
+                ConsoleUtils.printError("Não foi possível excluir o motorista. Tente novamente ou verifique se o motorista está vinculado a outros registros.");
+            }
+            ConsoleUtils.printError(MOTORISTA_ID_MSG + idDelete + " não encontrado. Não foi possível excluir.");
+        }
     }
 
     private void buscarRotaDoDia() {
-        System.out.println("\n--- Buscar Rota do Dia ---");
-        System.out.print("Digite o ID do motorista: ");
+        ConsoleUtils.println("\n--- Buscar Rota do Dia ---");
+        ConsoleUtils.print("Digite o ID do motorista");
         Long motoristaId = scanner.nextLong();
         scanner.nextLine();
-        System.out.print("Digite o ID do veículo: ");
+        ConsoleUtils.print("Digite o ID do veículo");
         Long veiculoId = scanner.nextLong();
         scanner.nextLine();
         var motoristaOpt = motoristaController.getById(motoristaId);
         var veiculoOpt = veiculoController.getById(veiculoId);
         if (motoristaOpt.isEmpty() || veiculoOpt.isEmpty()) {
-            System.out.println("Motorista ou veículo não encontrado.");
+            ConsoleUtils.println("Motorista ou veículo não encontrado.");
             return;
         }
         Rota rota = rotaService.buscarOuGerarRotaDoDia(motoristaOpt.get(), veiculoOpt.get());
         if (rota == null) {
-            System.out.println("Nenhuma rota disponível para hoje para este motorista e veículo.");
+            ConsoleUtils.println("Nenhuma rota disponível para hoje para este motorista e veículo.");
             return;
         }
-        System.out.println("Rota do dia:");
-        System.out.println(rota);
+        ConsoleUtils.println("Rota do dia:");
+        ConsoleUtils.println(rota != null ? rota.toString() : "Rota não encontrada.");
         if (rota.getColetas() == null || rota.getColetas().isEmpty()) {
-            System.out.println("Nenhuma coleta atribuída nesta rota.");
+            ConsoleUtils.println("Nenhuma coleta atribuída nesta rota.");
         } else {
-            System.out.println("Coletas nesta rota:");
+            ConsoleUtils.println("Coletas nesta rota:");
             for (Coleta coleta : rota.getColetas()) {
-                System.out.println(coleta);
+                ConsoleUtils.println(coleta != null ? coleta.toString() : "Coleta não encontrada.");
             }
         }
     }

@@ -6,14 +6,17 @@ import jakarta.persistence.Persistence;
 
 public class JpaUtil {
 
+    private JpaUtil() {
+    }
+
     private static final EntityManagerFactory entityManagerFactory;
 
     static {
         try {
             entityManagerFactory = Persistence.createEntityManagerFactory("ecocoleta-unit");
-            System.out.println("EntityManagerFactory inicializado com sucesso.");
+            ConsoleUtils.println("EntityManagerFactory inicializado com sucesso.");
         } catch (Exception e) {
-            System.err.println("Erro ao inicializar EntityManagerFactory: " + e.getMessage());
+            ConsoleUtils.printError("Erro ao inicializar EntityManagerFactory: " + e.getMessage());
             e.printStackTrace();
             throw new ExceptionInInitializerError(e);
         }
@@ -26,7 +29,7 @@ public class JpaUtil {
     public static void closeEntityManagerFactory() {
         if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
             entityManagerFactory.close();
-            System.out.println("EntityManagerFactory fechado.");
+            ConsoleUtils.println("EntityManagerFactory fechado.");
         }
     }
 }

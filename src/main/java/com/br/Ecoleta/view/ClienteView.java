@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class ClienteView {
+    private static final String CLIENTE_COM_ID = "Cliente com ID ";
     private final ClienteController clienteController;
     private final Scanner scanner;
 
@@ -72,32 +73,28 @@ public class ClienteView {
         ConsoleUtils.println("\n--- Cadastro de Cliente ---");
         ConsoleUtils.print("Nome");
         String nome = scanner.nextLine();
-        
         if (nome.trim().isEmpty()) {
+            ConsoleUtils.printError("O nome do cliente não pode estar vazio. Por favor, preencha corretamente.");
             throw new ValidationException("Nome não pode estar vazio");
         }
-
         ConsoleUtils.print("Documento (CPF/CNPJ)");
         String documento = scanner.nextLine();
-        
         if (documento.trim().isEmpty()) {
+            ConsoleUtils.printError("O documento do cliente não pode estar vazio. Por favor, preencha corretamente.");
             throw new ValidationException("Documento não pode estar vazio");
         }
-
         ConsoleUtils.print("Email");
         String email = scanner.nextLine();
-        
         if (email.trim().isEmpty()) {
+            ConsoleUtils.printError("O e-mail do cliente não pode estar vazio. Por favor, preencha corretamente.");
             throw new ValidationException("Email não pode estar vazio");
         }
-
         ConsoleUtils.print("Telefone");
         String telefone = scanner.nextLine();
-        
         if (telefone.trim().isEmpty()) {
+            ConsoleUtils.printError("O telefone do cliente não pode estar vazio. Por favor, preencha corretamente.");
             throw new ValidationException("Telefone não pode estar vazio");
         }
-
         Cliente novoCliente = new Cliente(nome, documento, email, telefone);
         clienteController.save(novoCliente);
         ConsoleUtils.printSuccess("Cliente cadastrado com sucesso!");
@@ -108,7 +105,7 @@ public class ClienteView {
         ConsoleUtils.printDivider();
         var clientes = clienteController.getAll();
         if (clientes.isEmpty()) {
-            ConsoleUtils.printInfo("Nenhum cliente cadastrado.");
+            ConsoleUtils.printInfo("Nenhum cliente cadastrado no sistema.");
         } else {
             clientes.forEach(cliente -> ConsoleUtils.println(cliente.toString()));
         }
@@ -120,13 +117,12 @@ public class ClienteView {
         ConsoleUtils.print("Digite o ID do cliente");
         Long idBusca = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Cliente> clienteOpt = clienteController.getById(idBusca);
         if (clienteOpt.isPresent()) {
             ConsoleUtils.printDivider();
             ConsoleUtils.println(clienteOpt.get().toString());
             ConsoleUtils.printDivider();
-        } else {
+            ConsoleUtils.printError(CLIENTE_COM_ID + idBusca + " não encontrado.");
             throw new EntityNotFoundException("Cliente", idBusca);
         }
     }
@@ -136,31 +132,25 @@ public class ClienteView {
         ConsoleUtils.print("Digite o ID do cliente a ser atualizado");
         Long idUpdate = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Cliente> clienteExistenteOpt = clienteController.getById(idUpdate);
         if (clienteExistenteOpt.isPresent()) {
             Cliente clienteExistente = clienteExistenteOpt.get();
             ConsoleUtils.println("Cliente encontrado. Digite os novos dados (deixe em branco para manter o atual):");
-            
             ConsoleUtils.print("Novo Nome (" + clienteExistente.getNome() + ")");
             String novoNome = scanner.nextLine();
             if (!novoNome.trim().isEmpty()) clienteExistente.setNome(novoNome);
-
             ConsoleUtils.print("Novo Documento (" + clienteExistente.getDocumento() + ")");
             String novoDocumento = scanner.nextLine();
             if (!novoDocumento.trim().isEmpty()) clienteExistente.setDocumento(novoDocumento);
-
             ConsoleUtils.print("Novo Email (" + clienteExistente.getEmail() + ")");
             String novoEmail = scanner.nextLine();
             if (!novoEmail.trim().isEmpty()) clienteExistente.setEmail(novoEmail);
-
             ConsoleUtils.print("Novo Telefone (" + clienteExistente.getTelefone() + ")");
             String novoTelefone = scanner.nextLine();
             if (!novoTelefone.trim().isEmpty()) clienteExistente.setTelefone(novoTelefone);
-
             clienteController.update(idUpdate, clienteExistente);
             ConsoleUtils.printSuccess("Cliente atualizado com sucesso!");
-        } else {
+            ConsoleUtils.printError(CLIENTE_COM_ID + idUpdate + " não encontrado. Não foi possível atualizar.");
             throw new EntityNotFoundException("Cliente", idUpdate);
         }
     }
@@ -170,15 +160,15 @@ public class ClienteView {
         ConsoleUtils.print("Digite o ID do cliente a ser excluído");
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Cliente> clienteOpt = clienteController.getById(idDelete);
         if (clienteOpt.isPresent()) {
             if (clienteController.delete(idDelete)) {
                 ConsoleUtils.printSuccess("Cliente excluído com sucesso!");
             } else {
+                ConsoleUtils.printError("Não foi possível excluir o cliente. Tente novamente ou verifique se o cliente está vinculado a outros registros.");
                 throw new ClienteException("Não foi possível excluir o cliente");
             }
-        } else {
+            ConsoleUtils.printError(CLIENTE_COM_ID + idDelete + " não encontrado. Não foi possível excluir.");
             throw new EntityNotFoundException("Cliente", idDelete);
         }
     }

@@ -6,12 +6,14 @@ import com.br.ecoleta.controller.VeiculoController;
 import com.br.ecoleta.model.Motorista;
 import com.br.ecoleta.model.Rota;
 import com.br.ecoleta.model.Veiculo;
+import com.br.ecoleta.util.ConsoleUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class RotaView {
+    private static final String ROTA_COM_ID = "Rota com ID ";
     private final RotaController rotaController;
     private final MotoristaController motoristaController;
     private final VeiculoController veiculoController;
@@ -27,16 +29,16 @@ public class RotaView {
     public void exibirMenuRota() {
         int subOpcao;
         do {
-            System.out.println("\n--- Gerenciar Rotas ---");
-            System.out.println("1. Cadastrar Rota");
-            System.out.println("2. Listar Todas as Rotas");
-            System.out.println("3. Buscar Rota por ID");
-            System.out.println("4. Atualizar Rota");
-            System.out.println("5. Excluir Rota");
-            System.out.println("6. Listar Coletas Pendentes de uma Rota");
-            System.out.println("0. Voltar ao Menu Principal");
+            ConsoleUtils.println("\n--- Gerenciar Rotas ---");
+            ConsoleUtils.println("1. Cadastrar Rota");
+            ConsoleUtils.println("2. Listar Todas as Rotas");
+            ConsoleUtils.println("3. Buscar Rota por ID");
+            ConsoleUtils.println("4. Atualizar Rota");
+            ConsoleUtils.println("5. Excluir Rota");
+            ConsoleUtils.println("6. Listar Coletas Pendentes de uma Rota");
+            ConsoleUtils.println("0. Voltar ao Menu Principal");
 
-            System.out.print("Opção: ");
+            ConsoleUtils.print("Opção");
             subOpcao = scanner.nextInt();
             scanner.nextLine();
 
@@ -61,33 +63,33 @@ public class RotaView {
                         listarColetasPendentesDaRota();
                         break;
                     case 0:
-                        System.out.println("Voltando ao Menu Principal.");
+                        ConsoleUtils.println("Voltando ao Menu Principal.");
                         break;
                     default:
-                        System.out.println("Opção inválida. Tente novamente.");
+                        ConsoleUtils.println("Opção inválida. Tente novamente.");
                 }
             } catch (DateTimeParseException e) {
-                System.err.println("Erro: Formato de data inválido. Use YYYY-MM-DD.");
+                ConsoleUtils.printError("Erro: Formato de data inválido. Use YYYY-MM-DD.");
             } catch (Exception e) {
-                System.err.println("Erro na operação de rotas: " + e.getMessage());
+                ConsoleUtils.printError("Erro na operação de rotas: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
     private void cadastrarRota() throws Exception {
-        System.out.println("\n--- Cadastro de Rota ---");
-        System.out.print("Data da Rota (YYYY-MM-DD): ");
+        ConsoleUtils.println("\n--- Cadastro de Rota ---");
+        ConsoleUtils.print("Data da Rota (YYYY-MM-DD)");
         String dataStr = scanner.nextLine();
         LocalDate dataRota = LocalDate.parse(dataStr);
 
-        System.out.print("Observações (opcional): ");
+        ConsoleUtils.print("Observações (opcional)");
         String observacoes = scanner.nextLine();
 
-        System.out.print("ID do Motorista: ");
+        ConsoleUtils.print("ID do Motorista");
         Long motoristaId = scanner.nextLong();
         scanner.nextLine();
 
-        System.out.print("ID do Veículo: ");
+        ConsoleUtils.print("ID do Veículo");
         Long veiculoId = scanner.nextLong();
         scanner.nextLine();
 
@@ -97,97 +99,131 @@ public class RotaView {
         if (motoristaOpt.isPresent() && veiculoOpt.isPresent()) {
             Rota novaRota = new Rota(dataRota, observacoes, motoristaOpt.get(), veiculoOpt.get());
             rotaController.save(novaRota);
+            ConsoleUtils.printSuccess("Rota cadastrada com sucesso!");
         } else {
-            System.out.println("Motorista ou Veículo não encontrado. Operação cancelada.");
+            ConsoleUtils.println("Motorista ou Veículo não encontrado. Operação cancelada.");
         }
     }
 
     private void listarTodasRotas() {
-        System.out.println("\n--- Todas as Rotas ---");
-        rotaController.getAll();
+        ConsoleUtils.println("\n--- Todas as Rotas ---");
+        var rotas = rotaController.getAll();
+        if (rotas.isEmpty()) {
+            ConsoleUtils.printInfo("Nenhuma rota cadastrada no sistema.");
+        } else {
+            rotas.forEach(rota -> ConsoleUtils.println(rota.toString()));
+        }
     }
 
     private void buscarRotaPorId() {
-        System.out.println("\n--- Buscar Rota por ID ---");
-        System.out.print("Digite o ID da rota: ");
+        ConsoleUtils.println("\n--- Buscar Rota por ID ---");
+        ConsoleUtils.print("Digite o ID da rota");
         Long idBusca = scanner.nextLong();
         scanner.nextLine();
-        rotaController.getById(idBusca);
+        Optional<Rota> rotaOpt = rotaController.getById(idBusca);
+        if (rotaOpt.isPresent()) {
+            ConsoleUtils.printDivider();
+            ConsoleUtils.println(rotaOpt.get().toString());
+            ConsoleUtils.printDivider();
+            ConsoleUtils.printError(ROTA_COM_ID + idBusca + " não encontrada.");
+        }
     }
 
     private void atualizarRota() throws Exception {
-        System.out.println("\n--- Atualizar Rota ---");
-        System.out.print("Digite o ID da rota a ser atualizada: ");
+        ConsoleUtils.println("\n--- Atualizar Rota ---");
+        ConsoleUtils.print("Digite o ID da rota a ser atualizada");
         Long idUpdate = scanner.nextLong();
         scanner.nextLine();
-
         Optional<Rota> rotaExistenteOpt = rotaController.getById(idUpdate);
         if (rotaExistenteOpt.isPresent()) {
             Rota rotaExistente = rotaExistenteOpt.get();
-            System.out.println("Rota encontrada. Digite os novos dados (deixe em branco para manter o atual):");
-
-            System.out.print("Nova Data da Rota (" + rotaExistente.getDataRota() + ") (YYYY-MM-DD): ");
-            String novaDataStr = scanner.nextLine();
-            if (!novaDataStr.trim().isEmpty()) rotaExistente.setDataRota(LocalDate.parse(novaDataStr));
-
-            System.out.print("Novas Observações (" + rotaExistente.getObservacoes() + "): ");
-            String novasObservacoes = scanner.nextLine();
-            if (!novasObservacoes.trim().isEmpty()) rotaExistente.setObservacoes(novasObservacoes);
-
-            System.out.print("Novo ID do Motorista (" + (rotaExistente.getMotorista() != null ? rotaExistente.getMotorista().getId() : "null") + "): ");
-            String novoMotoristaIdStr = scanner.nextLine();
-            if (!novoMotoristaIdStr.trim().isEmpty()) {
-                Long novoMotoristaId = Long.parseLong(novoMotoristaIdStr);
-                Optional<Motorista> novoMotoristaOpt = motoristaController.getById(novoMotoristaId);
-                if (novoMotoristaOpt.isPresent()) {
-                    rotaExistente.setMotorista(novoMotoristaOpt.get());
-                } else {
-                    System.out.println("Motorista com ID " + novoMotoristaId + " não encontrado. Motorista não será atualizado.");
-                }
-            }
-
-            System.out.print("Novo ID do Veículo (" + (rotaExistente.getVeiculo() != null ? rotaExistente.getVeiculo().getId() : "null") + "): ");
-            String novoVeiculoIdStr = scanner.nextLine();
-            if (!novoVeiculoIdStr.trim().isEmpty()) {
-                Long novoVeiculoId = Long.parseLong(novoVeiculoIdStr);
-                Optional<Veiculo> novoVeiculoOpt = veiculoController.getById(novoVeiculoId);
-                if (novoVeiculoOpt.isPresent()) {
-                    rotaExistente.setVeiculo(novoVeiculoOpt.get());
-                } else {
-                    System.out.println("Veículo com ID " + novoVeiculoId + " não encontrado. Veículo não será atualizado.");
-                }
-            }
-
+            ConsoleUtils.println("Rota encontrada. Digite os novos dados (deixe em branco para manter o atual):");
+            atualizarDataRota(rotaExistente);
+            atualizarObservacoesRota(rotaExistente);
+            atualizarMotoristaRota(rotaExistente);
+            atualizarVeiculoRota(rotaExistente);
             rotaController.update(idUpdate, rotaExistente);
-        } else {
-            System.out.println("Rota com ID " + idUpdate + " não encontrada.");
+            ConsoleUtils.printSuccess("Rota atualizada com sucesso!");
+            ConsoleUtils.printError(ROTA_COM_ID + idUpdate + " não encontrada. Não foi possível atualizar.");
+        }
+    }
+
+    private void atualizarDataRota(Rota rota) {
+        ConsoleUtils.print("Nova Data da Rota (" + rota.getDataRota() + ") (YYYY-MM-DD)");
+        String novaDataStr = scanner.nextLine();
+        if (!novaDataStr.trim().isEmpty()) {
+            rota.setDataRota(LocalDate.parse(novaDataStr));
+        }
+    }
+
+    private void atualizarObservacoesRota(Rota rota) {
+        ConsoleUtils.print("Novas Observações (" + rota.getObservacoes() + ")");
+        String novasObservacoes = scanner.nextLine();
+        if (!novasObservacoes.trim().isEmpty()) {
+            rota.setObservacoes(novasObservacoes);
+        }
+    }
+
+    private void atualizarMotoristaRota(Rota rota) {
+        ConsoleUtils.print("Novo ID do Motorista (" + (rota.getMotorista() != null ? rota.getMotorista().getId() : "null") + ")");
+        String novoMotoristaIdStr = scanner.nextLine();
+        if (!novoMotoristaIdStr.trim().isEmpty()) {
+            Long novoMotoristaId = Long.parseLong(novoMotoristaIdStr);
+            Optional<Motorista> novoMotoristaOpt = motoristaController.getById(novoMotoristaId);
+            if (novoMotoristaOpt.isPresent()) {
+                rota.setMotorista(novoMotoristaOpt.get());
+            } else {
+                ConsoleUtils.println("Motorista com ID " + novoMotoristaId + " não encontrado. Motorista não será atualizado.");
+            }
+        }
+    }
+
+    private void atualizarVeiculoRota(Rota rota) {
+        ConsoleUtils.print("Novo ID do Veículo (" + (rota.getVeiculo() != null ? rota.getVeiculo().getId() : "null") + ")");
+        String novoVeiculoIdStr = scanner.nextLine();
+        if (!novoVeiculoIdStr.trim().isEmpty()) {
+            Long novoVeiculoId = Long.parseLong(novoVeiculoIdStr);
+            Optional<Veiculo> novoVeiculoOpt = veiculoController.getById(novoVeiculoId);
+            if (novoVeiculoOpt.isPresent()) {
+                rota.setVeiculo(novoVeiculoOpt.get());
+            } else {
+                ConsoleUtils.println("Veículo com ID " + novoVeiculoId + " não encontrado. Veículo não será atualizado.");
+            }
         }
     }
 
     private void excluirRota() {
-        System.out.println("\n--- Excluir Rota ---");
-        System.out.print("Digite o ID da rota a ser excluída: ");
+        ConsoleUtils.println("\n--- Excluir Rota ---");
+        ConsoleUtils.print("Digite o ID da rota a ser excluída");
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
-        rotaController.delete(idDelete);
+        Optional<Rota> rotaOpt = rotaController.getById(idDelete);
+        if (rotaOpt.isPresent()) {
+            if (rotaController.delete(idDelete)) {
+                ConsoleUtils.printSuccess("Rota excluída com sucesso!");
+            } else {
+                ConsoleUtils.printError("Não foi possível excluir a rota. Tente novamente ou verifique se a rota está vinculada a outros registros.");
+            }
+            ConsoleUtils.printError(ROTA_COM_ID + idDelete + " não encontrada. Não foi possível excluir.");
+        }
     }
 
     private void listarColetasPendentesDaRota() {
-        System.out.println("\n--- Listar Coletas Pendentes de uma Rota ---");
-        System.out.print("Digite o ID da rota: ");
+        ConsoleUtils.println("\n--- Listar Coletas Pendentes de uma Rota ---");
+        ConsoleUtils.print("Digite o ID da rota");
         Long idRota = scanner.nextLong();
         scanner.nextLine();
         Optional<Rota> rotaOpt = rotaController.getById(idRota);
         if (rotaOpt.isPresent()) {
             var coletasPendentes = rotaController.getColetasPendentes(rotaOpt.get());
             if (coletasPendentes.isEmpty()) {
-                System.out.println("Nenhuma coleta pendente nesta rota.");
+                ConsoleUtils.println("Nenhuma coleta pendente nesta rota.");
             } else {
-                System.out.println("Coletas pendentes:");
-                coletasPendentes.forEach(System.out::println);
+                ConsoleUtils.println("Coletas pendentes:");
+                coletasPendentes.forEach(c -> ConsoleUtils.println(c.toString()));
             }
         } else {
-            System.out.println("Rota não encontrada.");
+            ConsoleUtils.println("Rota não encontrada.");
         }
     }
 }
