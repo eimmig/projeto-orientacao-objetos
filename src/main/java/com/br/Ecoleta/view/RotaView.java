@@ -33,6 +33,7 @@ public class RotaView {
             System.out.println("3. Buscar Rota por ID");
             System.out.println("4. Atualizar Rota");
             System.out.println("5. Excluir Rota");
+            System.out.println("6. Listar Coletas Pendentes de uma Rota");
             System.out.println("0. Voltar ao Menu Principal");
 
             System.out.print("Opção: ");
@@ -55,6 +56,9 @@ public class RotaView {
                         break;
                     case 5:
                         excluirRota();
+                        break;
+                    case 6:
+                        listarColetasPendentesDaRota();
                         break;
                     case 0:
                         System.out.println("Voltando ao Menu Principal.");
@@ -166,5 +170,24 @@ public class RotaView {
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
         rotaController.delete(idDelete);
+    }
+
+    private void listarColetasPendentesDaRota() {
+        System.out.println("\n--- Listar Coletas Pendentes de uma Rota ---");
+        System.out.print("Digite o ID da rota: ");
+        Long idRota = scanner.nextLong();
+        scanner.nextLine();
+        Optional<Rota> rotaOpt = rotaController.getById(idRota);
+        if (rotaOpt.isPresent()) {
+            var coletasPendentes = rotaController.getColetasPendentes(rotaOpt.get());
+            if (coletasPendentes.isEmpty()) {
+                System.out.println("Nenhuma coleta pendente nesta rota.");
+            } else {
+                System.out.println("Coletas pendentes:");
+                coletasPendentes.forEach(System.out::println);
+            }
+        } else {
+            System.out.println("Rota não encontrada.");
+        }
     }
 }

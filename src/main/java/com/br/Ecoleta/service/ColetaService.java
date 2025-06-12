@@ -8,4 +8,9 @@ public class ColetaService extends GenericService<Coleta, Long> {
     public ColetaService(ColetaRepository repository) {
         super(repository);
     }
+
+    @Override
+    protected String getEntityType() {
+        return Coleta.class.getName();
+    }
 }

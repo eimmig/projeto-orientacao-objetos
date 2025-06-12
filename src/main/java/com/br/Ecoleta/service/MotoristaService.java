@@ -8,4 +8,9 @@ public class MotoristaService extends GenericService<Motorista, Long> {
     public MotoristaService(MotoristaRepository repository) {
         super(repository);
     }
+
+    @Override
+    protected String getEntityType() {
+        return Motorista.class.getName();
+    }
 }

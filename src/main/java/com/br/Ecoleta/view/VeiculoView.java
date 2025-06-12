@@ -24,6 +24,7 @@ public class VeiculoView {
             System.out.println("3. Buscar Veículo por ID");
             System.out.println("4. Atualizar Veículo");
             System.out.println("5. Excluir Veículo");
+            System.out.println("6. Listar Veículos sem Rota/Motorista");
             System.out.println("0. Voltar ao Menu Principal");
 
             System.out.print("Opção: ");
@@ -46,6 +47,9 @@ public class VeiculoView {
                         break;
                     case 5:
                         excluirVeiculo();
+                        break;
+                    case 6:
+                        listarVeiculosSemRotaOuMotorista();
                         break;
                     case 0:
                         System.out.println("Voltando ao Menu Principal.");
@@ -126,5 +130,15 @@ public class VeiculoView {
         Long idDelete = scanner.nextLong();
         scanner.nextLine();
         veiculoController.delete(idDelete);
+    }
+
+    private void listarVeiculosSemRotaOuMotorista() {
+        System.out.println("\n--- Veículos sem Rota/Motorista ---");
+        var veiculos = veiculoController.getVeiculosSemRotaOuMotorista();
+        if (veiculos.isEmpty()) {
+            System.out.println("Nenhum veículo desvinculado encontrado.");
+        } else {
+            veiculos.forEach(System.out::println);
+        }
     }
 }

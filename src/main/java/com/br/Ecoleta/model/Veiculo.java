@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
-import com.br.ecoleta.util.TipoVeiculo; // Importa o novo Enum
+import com.br.ecoleta.util.TipoVeiculo;
 
 @Entity
 @Table(name = "veiculos")
@@ -94,7 +94,7 @@ public class Veiculo extends GenericModel {
         return "Veiculo{" +
                 "id=" + this.getId() +
                 ", placa='" + placa + '\'' +
-                ", modelo=" + modelo + // Retorna o nome do Enum
+                ", modelo=" + modelo +
                 ", capacidadeKg=" + capacidadeKg +
                 ", createdAt=" + getCreatedAt() +
                 ", updatedAt=" + getUpdatedAt() +

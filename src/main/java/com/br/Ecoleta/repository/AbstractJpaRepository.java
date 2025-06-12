@@ -87,4 +87,8 @@ public abstract class AbstractJpaRepository<T, ID> implements GenericRepository<
             throw new RuntimeException("Erro ao atualizar entidade: " + e.getMessage(), e);
         }
     }
+
+    public EntityManager getEntityManager() {
+        return this.entityManager;
+    }
 }

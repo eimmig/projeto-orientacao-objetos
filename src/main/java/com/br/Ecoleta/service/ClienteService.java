@@ -8,4 +8,9 @@ public class ClienteService extends GenericService<Cliente, Long> {
     public ClienteService(ClienteRepository repository) {
         super(repository);
     }
+
+    @Override
+    protected String getEntityType() {
+        return Cliente.class.getName();
+    }
 }

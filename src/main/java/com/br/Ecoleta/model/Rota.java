@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "rotas")
@@ -86,6 +88,16 @@ public class Rota extends GenericModel {
     public void removeColeta(Coleta coleta) {
         this.coletas.remove(coleta);
         coleta.setRota(null);
+    }
+
+    public List<Coleta> getColetasPendentes() {
+        List<Coleta> pendentes = new ArrayList<>();
+        for (Coleta coleta : this.coletas) {
+            if (coleta.getStatus() == com.br.ecoleta.util.ColetaStatus.PENDENTE) {
+                pendentes.add(coleta);
+            }
+        }
+        return pendentes;
     }
 
     @Override

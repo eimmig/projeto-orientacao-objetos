@@ -1,6 +1,8 @@
 package com.br.ecoleta.service;
 
 import com.br.ecoleta.repository.GenericRepository;
+import com.br.ecoleta.exception.EntityNotFoundException;
+import com.br.ecoleta.exception.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,36 +14,44 @@ public abstract class GenericService<T, ID> {
         this.repository = repository;
     }
 
-    public T save(T item) throws Exception {
-        System.out.println("Serviço: Tentando salvar item...");
-        return repository.save(item);
+    public T save(T item) throws ValidationException {
+        try {
+            return repository.save(item);
+        } catch (Exception e) {
+            throw new ValidationException("Erro ao salvar: " + e.getMessage());
+        }
     }
 
     public List<T> getAll() {
-        System.out.println("Serviço: Buscando todos os itens...");
         return repository.findAll();
     }
 
     public Optional<T> getById(ID id) {
-        System.out.println("Serviço: Buscando item por ID...");
         return repository.findById(id);
     }
 
-    public boolean delete(ID id) throws RuntimeException {
-        System.out.println("Serviço: Tentando deletar item...");
+    public boolean delete(ID id) throws EntityNotFoundException {
         if (repository.existsById(id)) {
-            repository.deleteById(id);
-            System.out.println("Serviço: Item deletado com sucesso.");
-            return true;
+            try {
+                repository.deleteById(id);
+                return true;
+            } catch (Exception e) {
+                throw new ValidationException("Erro ao excluir: " + e.getMessage());
+            }
         }
-        throw new RuntimeException("Item não encontrado para exclusão.");
+        throw new EntityNotFoundException(getEntityType(), (Long) id);
     }
 
-    public T update(ID id, T updatedItem) throws RuntimeException {
-        System.out.println("Serviço: Tentando atualizar item...");
+    public T update(ID id, T updatedItem) throws EntityNotFoundException, ValidationException {
         if (repository.existsById(id)) {
-            return repository.update(updatedItem);
+            try {
+                return repository.update(updatedItem);
+            } catch (Exception e) {
+                throw new ValidationException("Erro ao atualizar: " + e.getMessage());
+            }
         }
-        throw new RuntimeException("Item não encontrado para atualização.");
+        throw new EntityNotFoundException(getEntityType(), (Long) id);
     }
+
+    protected abstract String getEntityType();
 }

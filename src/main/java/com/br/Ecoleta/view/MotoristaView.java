@@ -3,11 +3,9 @@ package com.br.ecoleta.view;
 import com.br.ecoleta.controller.MotoristaController;
 import com.br.ecoleta.controller.VeiculoController;
 import com.br.ecoleta.model.Motorista;
-import com.br.ecoleta.model.Veiculo;
 import com.br.ecoleta.model.Rota;
 import com.br.ecoleta.model.Coleta;
 import com.br.ecoleta.service.RotaService;
-import com.br.ecoleta.service.ColetaService;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -15,14 +13,12 @@ public class MotoristaView {
     private final MotoristaController motoristaController;
     private final VeiculoController veiculoController;
     private final RotaService rotaService;
-    private final ColetaService coletaService;
     private final Scanner scanner;
 
-    public MotoristaView(MotoristaController motoristaController, VeiculoController veiculoController, RotaService rotaService, ColetaService coletaService, Scanner scanner) {
+    public MotoristaView(MotoristaController motoristaController, VeiculoController veiculoController, RotaService rotaService, Scanner scanner) {
         this.motoristaController = motoristaController;
         this.veiculoController = veiculoController;
         this.rotaService = rotaService;
-        this.coletaService = coletaService;
         this.scanner = scanner;
     }
 
@@ -157,7 +153,7 @@ public class MotoristaView {
             System.out.println("Motorista ou veículo não encontrado.");
             return;
         }
-        Rota rota = rotaService.buscarOuGerarRotaDoDia(motoristaOpt.get(), veiculoOpt.get(), coletaService);
+        Rota rota = rotaService.buscarOuGerarRotaDoDia(motoristaOpt.get(), veiculoOpt.get());
         if (rota == null) {
             System.out.println("Nenhuma rota disponível para hoje para este motorista e veículo.");
             return;
