@@ -3,6 +3,8 @@ package com.br.ecoleta.view;
 import com.br.ecoleta.controller.MotoristaController;
 import com.br.ecoleta.controller.RotaController;
 import com.br.ecoleta.controller.VeiculoController;
+import com.br.ecoleta.exception.EntityNotFoundException;
+import com.br.ecoleta.exception.RotaException;
 import com.br.ecoleta.model.Motorista;
 import com.br.ecoleta.model.Rota;
 import com.br.ecoleta.model.Veiculo;
@@ -70,13 +72,15 @@ public class RotaView {
                 }
             } catch (DateTimeParseException e) {
                 ConsoleUtils.printError("Erro: Formato de data inválido. Use YYYY-MM-DD.");
+            } catch (RotaException e) {
+                ConsoleUtils.printError("Erro de rota: " + e.getMessage());
             } catch (Exception e) {
-                ConsoleUtils.printError("Erro na operação de rotas: " + e.getMessage());
+                ConsoleUtils.printError("Erro inesperado: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
-    private void cadastrarRota() throws Exception {
+    private void cadastrarRota() {
         ConsoleUtils.println("\n--- Cadastro de Rota ---");
         ConsoleUtils.print("Data da Rota (YYYY-MM-DD)");
         String dataStr = scanner.nextLine();
@@ -102,6 +106,7 @@ public class RotaView {
             ConsoleUtils.printSuccess("Rota cadastrada com sucesso!");
         } else {
             ConsoleUtils.println("Motorista ou Veículo não encontrado. Operação cancelada.");
+            throw new RotaException("Motorista ou Veículo não encontrado para a rota");
         }
     }
 
@@ -129,7 +134,7 @@ public class RotaView {
         }
     }
 
-    private void atualizarRota() throws Exception {
+    private void atualizarRota() throws EntityNotFoundException {
         ConsoleUtils.println("\n--- Atualizar Rota ---");
         ConsoleUtils.print("Digite o ID da rota a ser atualizada");
         Long idUpdate = scanner.nextLong();

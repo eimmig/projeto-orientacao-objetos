@@ -1,7 +1,8 @@
 package com.br.ecoleta.view;
 
 import com.br.ecoleta.controller.VeiculoController;
-import com.br.ecoleta.exception.ValidationException;
+import com.br.ecoleta.exception.EntityNotFoundException;
+import com.br.ecoleta.exception.VeiculoException;
 import com.br.ecoleta.model.Veiculo;
 import com.br.ecoleta.util.ConsoleUtils;
 import com.br.ecoleta.util.TipoVeiculo;
@@ -62,19 +63,21 @@ public class VeiculoView {
                 }
             } catch (IllegalArgumentException e) {
                 ConsoleUtils.printError("Erro: Modelo de veículo inválido. Por favor, use um dos valores listados.");
+            } catch (VeiculoException e) {
+                ConsoleUtils.printError("Erro de veículo: " + e.getMessage());
             } catch (Exception e) {
-                ConsoleUtils.printError("Erro na operação de veículos: " + e.getMessage());
+                ConsoleUtils.printError("Erro inesperado: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
-    private void cadastrarVeiculo() throws Exception {
+    private void cadastrarVeiculo() {
         ConsoleUtils.println("\n--- Cadastro de Veículo ---");
         ConsoleUtils.print("Placa");
         String placa = scanner.nextLine();
         if (placa.trim().isEmpty()) {
             ConsoleUtils.printError("A placa do veículo não pode estar vazia. Por favor, preencha corretamente.");
-            throw new ValidationException("Placa não pode estar vazia");
+            throw new VeiculoException("Placa não pode estar vazia");
         }
         ConsoleUtils.print("Modelo (CAMINHAO, CARRO, CAMINHONETE, SUV, VAN)");
         String modeloStr = scanner.nextLine().toUpperCase();
@@ -111,7 +114,7 @@ public class VeiculoView {
         }
     }
 
-    private void atualizarVeiculo() throws Exception {
+    private void atualizarVeiculo() throws EntityNotFoundException {
         ConsoleUtils.println("\n--- Atualizar Veículo ---");
         ConsoleUtils.print("Digite o ID do veículo a ser atualizado");
         Long idUpdate = scanner.nextLong();

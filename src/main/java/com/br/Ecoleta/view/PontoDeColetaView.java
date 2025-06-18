@@ -2,7 +2,7 @@ package com.br.ecoleta.view;
 
 import com.br.ecoleta.controller.ClienteController;
 import com.br.ecoleta.controller.PontoDeColetaController;
-import com.br.ecoleta.exception.ValidationException;
+import com.br.ecoleta.exception.PontoDeColetaException;
 import com.br.ecoleta.model.Cliente;
 import com.br.ecoleta.model.PontoDeColeta;
 import com.br.ecoleta.util.ConsoleUtils;
@@ -59,25 +59,27 @@ public class PontoDeColetaView {
                     default:
                         ConsoleUtils.println("Opção inválida. Tente novamente.");
                 }
+            } catch (PontoDeColetaException e) {
+                ConsoleUtils.printError("Erro de ponto de coleta: " + e.getMessage());
             } catch (Exception e) {
-                ConsoleUtils.printError("Erro na operação de pontos de coleta: " + e.getMessage());
+                ConsoleUtils.printError("Erro inesperado: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
-    private void cadastrarPontoDeColeta() throws Exception {
+    private void cadastrarPontoDeColeta() {
         ConsoleUtils.println("\n--- Cadastro de Ponto de Coleta ---");
         ConsoleUtils.print("Nome do Local");
         String nomeLocal = scanner.nextLine();
         if (nomeLocal.trim().isEmpty()) {
             ConsoleUtils.printError("O nome do local não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Nome do local não pode estar vazio");
+            throw new PontoDeColetaException("Nome do local não pode estar vazio");
         }
         ConsoleUtils.print("Endereço");
         String endereco = scanner.nextLine();
         if (endereco.trim().isEmpty()) {
             ConsoleUtils.printError("O endereço não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Endereço não pode estar vazio");
+            throw new PontoDeColetaException("Endereço não pode estar vazio");
         }
         ConsoleUtils.print("Latitude");
         Double latitude = scanner.nextDouble();
@@ -94,6 +96,7 @@ public class PontoDeColetaView {
             ConsoleUtils.printSuccess("Ponto de Coleta cadastrado com sucesso!");
         } else {
             ConsoleUtils.printError("Cliente com ID " + clienteId + " não encontrado. Cadastro de ponto de coleta cancelado.");
+            throw new PontoDeColetaException("Cliente não encontrado para o ponto de coleta");
         }
     }
 
@@ -121,7 +124,7 @@ public class PontoDeColetaView {
         }
     }
 
-    private void atualizarPontoDeColeta() throws Exception {
+    private void atualizarPontoDeColeta() {
         ConsoleUtils.println("\n--- Atualizar Ponto de Coleta ---");
         ConsoleUtils.print("Digite o ID do ponto de coleta a ser atualizado");
         Long idUpdate = scanner.nextLong();
@@ -175,7 +178,7 @@ public class PontoDeColetaView {
         }
     }
 
-    private void atualizarCliente(PontoDeColeta ponto) throws Exception {
+    private void atualizarCliente(PontoDeColeta ponto) {
         ConsoleUtils.print("Novo ID do Cliente (" + ponto.getCliente().getId() + ")");
         String clienteIdStr = scanner.nextLine();
         if (!clienteIdStr.trim().isEmpty()) {

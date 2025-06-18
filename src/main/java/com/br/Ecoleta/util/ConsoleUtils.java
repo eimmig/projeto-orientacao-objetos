@@ -33,7 +33,6 @@ public class ConsoleUtils {
     }
 
     public static void clear() {
-        // Limpeza de tela não é suportada via logger, mas mantemos para compatibilidade
         System.out.print("\033[H\033[2J");
         System.out.flush();
         logger.fine("Tela limpa pelo usuário.");

@@ -7,7 +7,7 @@ import com.br.ecoleta.model.Rota;
 import com.br.ecoleta.model.Coleta;
 import com.br.ecoleta.service.RotaService;
 import com.br.ecoleta.util.ConsoleUtils;
-import com.br.ecoleta.exception.ValidationException;
+import com.br.ecoleta.exception.MotoristaException;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -67,37 +67,39 @@ public class MotoristaView {
                     default:
                         ConsoleUtils.println("Opção inválida. Tente novamente.");
                 }
+            } catch (MotoristaException e) {
+                ConsoleUtils.printError("Erro de motorista: " + e.getMessage());
             } catch (Exception e) {
-                ConsoleUtils.printError("Erro na operação de motoristas: " + e.getMessage());
+                ConsoleUtils.printError("Erro inesperado: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
-    private void cadastrarMotorista() throws Exception {
+    private void cadastrarMotorista() {
         ConsoleUtils.println("\n--- Cadastro de Motorista ---");
         ConsoleUtils.print("Nome");
         String nome = scanner.nextLine();
         if (nome.trim().isEmpty()) {
             ConsoleUtils.printError("O nome do motorista não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Nome não pode estar vazio");
+            throw new MotoristaException("Nome não pode estar vazio");
         }
         ConsoleUtils.print("CPF");
         String cpf = scanner.nextLine();
         if (cpf.trim().isEmpty()) {
             ConsoleUtils.printError("O CPF do motorista não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("CPF não pode estar vazio");
+            throw new MotoristaException("CPF não pode estar vazio");
         }
         ConsoleUtils.print("CNH");
         String cnh = scanner.nextLine();
         if (cnh.trim().isEmpty()) {
             ConsoleUtils.printError("A CNH do motorista não pode estar vazia. Por favor, preencha corretamente.");
-            throw new ValidationException("CNH não pode estar vazia");
+            throw new MotoristaException("CNH não pode estar vazia");
         }
         ConsoleUtils.print("Telefone");
         String telefone = scanner.nextLine();
         if (telefone.trim().isEmpty()) {
             ConsoleUtils.printError("O telefone do motorista não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Telefone não pode estar vazio");
+            throw new MotoristaException("Telefone não pode estar vazio");
         }
         Motorista novoMotorista = new Motorista(nome, cpf, cnh, telefone);
         motoristaController.save(novoMotorista);
@@ -128,7 +130,7 @@ public class MotoristaView {
         }
     }
 
-    private void atualizarMotorista() throws Exception {
+    private void atualizarMotorista() {
         ConsoleUtils.println("\n--- Atualizar Motorista ---");
         ConsoleUtils.print("Digite o ID do motorista a ser atualizado");
         Long idUpdate = scanner.nextLong();
@@ -191,13 +193,13 @@ public class MotoristaView {
             return;
         }
         ConsoleUtils.println("Rota do dia:");
-        ConsoleUtils.println(rota != null ? rota.toString() : "Rota não encontrada.");
+        ConsoleUtils.println(rota.toString());
         if (rota.getColetas() == null || rota.getColetas().isEmpty()) {
             ConsoleUtils.println("Nenhuma coleta atribuída nesta rota.");
         } else {
             ConsoleUtils.println("Coletas nesta rota:");
             for (Coleta coleta : rota.getColetas()) {
-                ConsoleUtils.println(coleta != null ? coleta.toString() : "Coleta não encontrada.");
+                ConsoleUtils.println(coleta.toString());
             }
         }
     }

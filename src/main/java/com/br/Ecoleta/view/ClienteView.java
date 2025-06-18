@@ -57,43 +57,43 @@ public class ClienteView {
                     default:
                         ConsoleUtils.printError("Opção inválida. Tente novamente.");
                 }
+            } catch (ClienteException e) {
+                ConsoleUtils.printError("Erro no cadastro de cliente: " + e.getMessage());
             } catch (ValidationException e) {
                 ConsoleUtils.printError("Erro de validação: " + e.getMessage());
             } catch (EntityNotFoundException e) {
                 ConsoleUtils.printError(e.getMessage());
-            } catch (ClienteException e) {
-                ConsoleUtils.printError("Erro no cadastro de cliente: " + e.getMessage());
             } catch (Exception e) {
                 ConsoleUtils.printError("Erro inesperado: " + e.getMessage());
             }
         } while (subOpcao != 0);
     }
 
-    private void cadastrarCliente() throws Exception {
+    private void cadastrarCliente() {
         ConsoleUtils.println("\n--- Cadastro de Cliente ---");
         ConsoleUtils.print("Nome");
         String nome = scanner.nextLine();
         if (nome.trim().isEmpty()) {
             ConsoleUtils.printError("O nome do cliente não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Nome não pode estar vazio");
+            throw new ClienteException("Nome não pode estar vazio");
         }
         ConsoleUtils.print("Documento (CPF/CNPJ)");
         String documento = scanner.nextLine();
         if (documento.trim().isEmpty()) {
             ConsoleUtils.printError("O documento do cliente não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Documento não pode estar vazio");
+            throw new ClienteException("Documento não pode estar vazio");
         }
         ConsoleUtils.print("Email");
         String email = scanner.nextLine();
         if (email.trim().isEmpty()) {
             ConsoleUtils.printError("O e-mail do cliente não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Email não pode estar vazio");
+            throw new ClienteException("Email não pode estar vazio");
         }
         ConsoleUtils.print("Telefone");
         String telefone = scanner.nextLine();
         if (telefone.trim().isEmpty()) {
             ConsoleUtils.printError("O telefone do cliente não pode estar vazio. Por favor, preencha corretamente.");
-            throw new ValidationException("Telefone não pode estar vazio");
+            throw new ClienteException("Telefone não pode estar vazio");
         }
         Cliente novoCliente = new Cliente(nome, documento, email, telefone);
         clienteController.save(novoCliente);
@@ -127,7 +127,7 @@ public class ClienteView {
         }
     }
 
-    private void atualizarCliente() throws Exception {
+    private void atualizarCliente() throws EntityNotFoundException {
         ConsoleUtils.println("\n--- Atualizar Cliente ---");
         ConsoleUtils.print("Digite o ID do cliente a ser atualizado");
         Long idUpdate = scanner.nextLong();

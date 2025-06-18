@@ -10,6 +10,7 @@ public class JpaUtil {
     }
 
     private static final EntityManagerFactory entityManagerFactory;
+    private static EntityManagerFactory testEntityManagerFactory;
 
     static {
         try {
@@ -26,10 +27,21 @@ public class JpaUtil {
         return entityManagerFactory.createEntityManager();
     }
 
+    public static EntityManager getTestEntityManager() {
+        if (testEntityManagerFactory == null) {
+            testEntityManagerFactory = Persistence.createEntityManagerFactory("ecocoleta-test-db2");
+        }
+        return testEntityManagerFactory.createEntityManager();
+    }
+
     public static void closeEntityManagerFactory() {
         if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
             entityManagerFactory.close();
             ConsoleUtils.println("EntityManagerFactory fechado.");
+        }
+        if (testEntityManagerFactory != null && testEntityManagerFactory.isOpen()) {
+            testEntityManagerFactory.close();
+            ConsoleUtils.println("Test EntityManagerFactory fechado.");
         }
     }
 }
