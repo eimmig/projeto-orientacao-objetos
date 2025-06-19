@@ -21,13 +21,12 @@ class PontoDeColetaServiceTest {
         em = JpaUtil.getEntityManager();
         service = new PontoDeColetaService(new PontoDeColetaRepository(em));
         clienteService = new ClienteService(new ClienteRepository(em));
-        cliente = clienteService.save(new Cliente("Cliente Ponto", "11111111111", "cliente@ponto.com", "888888888"));
+        cliente = clienteService.save(new Cliente("Cliente Ponto", "11111111111-PONTO", "cliente_ponto@ponto.com", "888888888"));
     }
 
     @AfterAll
     static void tearDownAll() {
         if (em != null && em.isOpen()) em.close();
-        JpaUtil.closeEntityManagerFactory();
     }
 
     @Test

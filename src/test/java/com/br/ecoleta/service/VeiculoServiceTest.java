@@ -22,7 +22,6 @@ class VeiculoServiceTest {
     @AfterAll
     static void tearDownAll() {
         if (em != null && em.isOpen()) em.close();
-        JpaUtil.closeEntityManagerFactory();
     }
 
     @Test

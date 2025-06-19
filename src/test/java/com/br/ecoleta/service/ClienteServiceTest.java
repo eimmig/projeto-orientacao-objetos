@@ -21,12 +21,11 @@ class ClienteServiceTest {
     @AfterAll
     static void tearDownAll() {
         if (em != null && em.isOpen()) em.close();
-        JpaUtil.closeEntityManagerFactory();
     }
 
     @Test
     void crudCliente() {
-        Cliente cliente = new Cliente("Teste", "12345678900", "teste@email.com", "999999999");
+        Cliente cliente = new Cliente("Teste", "12345678900-CLIENTE", "teste_cliente@email.com", "999999999");
         Cliente saved = service.save(cliente);
         assertNotNull(saved.getId());
 

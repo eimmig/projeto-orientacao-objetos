@@ -13,6 +13,10 @@ import org.junit.jupiter.api.*;
 import java.time.LocalDate;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
+import com.br.ecoleta.model.Cliente;
+import com.br.ecoleta.model.PontoDeColeta;
+import com.br.ecoleta.repository.ClienteRepository;
+import com.br.ecoleta.repository.PontoDeColetaRepository;
 
 class RotaServiceTest {
     private static EntityManager em;
@@ -37,7 +41,6 @@ class RotaServiceTest {
     @AfterAll
     static void tearDownAll() {
         if (em != null && em.isOpen()) em.close();
-        JpaUtil.closeEntityManagerFactory();
     }
 
     @Test
@@ -69,13 +72,21 @@ class RotaServiceTest {
 
     @Test
     void testCalcularRotaParaMotorista() {
+        Cliente cliente = new Cliente("Cliente Rota", "33333333333", "cliente@rota.com", "666666666");
+        ClienteService clienteService = new ClienteService(new ClienteRepository(em));
+        cliente = clienteService.save(cliente);
+
+        PontoDeColeta ponto = new PontoDeColeta("Ponto Rota", "Rua Rota", 5.0, 6.0, cliente);
+        PontoDeColetaService pontoService = new PontoDeColetaService(new PontoDeColetaRepository(em));
+        ponto = pontoService.save(ponto);
+
         com.br.ecoleta.model.Coleta coleta = new com.br.ecoleta.model.Coleta(
                 java.time.LocalDateTime.now(),
                 100.0,
                 "Coleta para rota",
                 com.br.ecoleta.util.ColetaStatus.PENDENTE,
-                null,
-                null,
+                cliente,
+                ponto,
                 null
         );
         coletaService.save(coleta);

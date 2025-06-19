@@ -22,9 +22,13 @@ class ColetaServiceTest {
     private static ClienteService clienteService;
     private static PontoDeColetaService pontoService;
     private static RotaService rotaService;
+    private static MotoristaService motoristaService;
+    private static VeiculoService veiculoService;
     private static Cliente cliente;
     private static PontoDeColeta ponto;
     private static Rota rota;
+    private static com.br.ecoleta.model.Motorista motorista;
+    private static com.br.ecoleta.model.Veiculo veiculo;
 
     @BeforeAll
     static void setupAll() {
@@ -33,15 +37,18 @@ class ColetaServiceTest {
         clienteService = new ClienteService(new ClienteRepository(em));
         pontoService = new PontoDeColetaService(new PontoDeColetaRepository(em));
         rotaService = new RotaService(new RotaRepository(em), service);
-        cliente = clienteService.save(new Cliente("Cliente Coleta", "33333333333", "cliente@coleta.com", "666666666"));
+        motoristaService = new MotoristaService(new com.br.ecoleta.repository.MotoristaRepository(em));
+        veiculoService = new VeiculoService(new com.br.ecoleta.repository.VeiculoRepository(em));
+        cliente = clienteService.save(new Cliente("Cliente Coleta", "33333333333-COLETA", "cliente_coleta@coleta.com", "666666666"));
         ponto = pontoService.save(new PontoDeColeta("Ponto Coleta", "Rua Coleta", 1.0, 2.0, cliente));
-        rota = rotaService.save(new Rota(java.time.LocalDate.now(), "Obs", null, null));
+        motorista = motoristaService.save(new com.br.ecoleta.model.Motorista("Motorista Coleta", "44444444444", "CNH444", "555555555"));
+        veiculo = veiculoService.save(new com.br.ecoleta.model.Veiculo("COE1234", com.br.ecoleta.util.TipoVeiculo.CARRO, 1000.0));
+        rota = rotaService.save(new Rota(java.time.LocalDate.now(), "Obs", motorista, veiculo));
     }
 
     @AfterAll
     static void tearDownAll() {
         if (em != null && em.isOpen()) em.close();
-        JpaUtil.closeEntityManagerFactory();
     }
 
     @Test
